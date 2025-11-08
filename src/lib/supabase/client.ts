@@ -1,21 +1,23 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-
-let cachedClient: SupabaseClient | undefined;
+import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn(
+    "Supabase browser client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
+  );
+}
+
 export const isSupabaseConfigured =
   Boolean(supabaseUrl) && Boolean(supabaseAnonKey);
 
-export function getSupabaseClient() {
-  if (!isSupabaseConfigured) {
-    return undefined;
+export function createSupabaseBrowserClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Missing Supabase browser env vars. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set."
+    );
   }
 
-  if (!cachedClient) {
-    cachedClient = createClient(supabaseUrl!, supabaseAnonKey!);
-  }
-
-  return cachedClient;
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 }

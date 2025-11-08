@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { SessionProvider } from "@/components/providers/session-provider";
 import { SiteHeader } from "@/components/site-header";
+import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,20 +24,24 @@ export const metadata: Metadata = {
     "Modern fitness intelligence for teams, trainers, and boutique studios.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
       >
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="container flex-1 py-12">{children}</main>
-        </div>
+        <SessionProvider initialUser={user}>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="container flex-1 py-12">{children}</main>
+          </div>
+        </SessionProvider>
       </body>
     </html>
   );

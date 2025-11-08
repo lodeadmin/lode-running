@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Gauge, ShieldCheck, Waves } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { requireUser } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
 export const metadata: Metadata = {
@@ -26,7 +27,9 @@ const readinessCards = [
   },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await requireUser();
+
   return (
     <div className="space-y-10">
       <div className="flex flex-wrap items-center justify-between gap-6">
@@ -41,6 +44,9 @@ export default function DashboardPage() {
           <p className="mt-2 max-w-2xl text-slate-600">
             This dashboard is gated behind authentication. Plug in Supabase Auth
             to secure session-aware coaching tools for every athlete.
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Signed in as <span className="font-semibold">{user.email}</span>
           </p>
         </div>
         <Button asChild className="rounded-full px-6">

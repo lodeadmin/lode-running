@@ -3,6 +3,7 @@ import { PlugZap, Shield, WifiHigh } from "lucide-react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { requireUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -66,7 +67,9 @@ const statusStyles: Record<
   },
 };
 
-export default function DevicesPage() {
+export default async function DevicesPage() {
+  const user = await requireUser();
+
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -82,6 +85,9 @@ export default function DevicesPage() {
             Invite vendors, approve scopes, and monitor live sync queues. This
             view will only appear for authenticated team members once auth is
             enabled.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {user.email}
           </p>
         </div>
         <Button className="rounded-full px-6" variant="secondary">

@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserRound } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { useSession } from "@/components/providers/session-provider";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -15,6 +16,9 @@ const navItems = [
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { user } = useSession();
+  const userInitial =
+    user?.email?.[0]?.toUpperCase() ?? user?.user_metadata?.full_name?.[0]?.toUpperCase() ?? "VF";
 
   return (
     <header className="sticky top-0 z-30 border-b border-white/40 bg-white/70 backdrop-blur-xl">
@@ -25,7 +29,9 @@ export function SiteHeader() {
           </div>
           <div>
             <p className="text-lg font-semibold text-slate-900">Vibe Fitness</p>
-            <p className="text-sm text-muted-foreground">Feel the difference</p>
+            <p className="text-sm text-muted-foreground">
+              {user?.email ? `Signed in as ${user.email}` : "Guest session"}
+            </p>
           </div>
         </Link>
 
@@ -55,7 +61,11 @@ export function SiteHeader() {
             <Link href="/dashboard">Go to Dashboard</Link>
           </Button>
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-indigo-500 text-white shadow-lg">
-            <UserRound className="size-5" />
+            {user ? (
+              <span className="text-sm font-semibold">{userInitial}</span>
+            ) : (
+              <UserRound className="size-5" />
+            )}
           </div>
         </div>
       </div>

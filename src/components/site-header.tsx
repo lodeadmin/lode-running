@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserRound } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { useSession } from "@/components/providers/session-provider";
+import { SignOutButton } from "@/components/sign-out-button";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -57,16 +66,46 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Button asChild size="sm" variant="ghost" className="hidden md:inline-flex">
-            <Link href="/dashboard">Go to Dashboard</Link>
-          </Button>
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-indigo-500 text-white shadow-lg">
-            {user ? (
-              <span className="text-sm font-semibold">{userInitial}</span>
-            ) : (
-              <UserRound className="size-5" />
-            )}
-          </div>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-indigo-500 text-white">
+                    {userInitial}
+                  </span>
+                  <ChevronDown className="size-4 text-slate-500" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[220px]">
+                <DropdownMenuLabel className="flex flex-col gap-0.5">
+                  <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+                    Account
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    {user.email ?? "Signed in"}
+                  </span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/devices">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <SignOutButton>Sign out</SignOutButton>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button asChild size="sm" variant="ghost" className="hidden md:inline-flex">
+                <Link href="/signin">Sign in</Link>
+              </Button>
+              <Button asChild size="sm" className="rounded-full px-5 font-semibold shadow-brand">
+                <Link href="/signup">Get started</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

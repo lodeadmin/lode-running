@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { SessionProvider } from "@/components/providers/session-provider";
 import { SiteHeader } from "@/components/site-header";
+import { Toaster } from "@/components/ui/sonner";
 import { getCurrentUser } from "@/lib/auth";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default async function RootLayout({
             <SiteHeader />
             <main className="container flex-1 py-12">{children}</main>
           </div>
+          <Toaster />
         </SessionProvider>
       </body>
     </html>

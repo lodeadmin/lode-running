@@ -1,74 +1,43 @@
 import type { Metadata } from "next";
 import { PlugZap, Shield, WifiHigh } from "lucide-react";
-import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { DeviceManager } from "@/components/devices/device-manager";
 import { requireUser } from "@/lib/auth";
-import { cn } from "@/lib/utils";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Devices • Vibe Fitness",
 };
 
-const DeviceSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  type: z.enum(["Wearable", "Bike", "Rowing", "Sensor"]),
-  status: z.enum(["connected", "pending", "error"]),
-  lastSync: z.string(),
-});
-
-const parsedDevices = DeviceSchema.array().parse([
-  {
-    id: "vf-01",
-    name: "PulseBand Pro",
-    type: "Wearable",
-    status: "connected",
-    lastSync: "2 min ago",
-  },
-  {
-    id: "vf-02",
-    name: "Vector Bike Studio",
-    type: "Bike",
-    status: "pending",
-    lastSync: "Awaiting approval",
-  },
-  {
-    id: "vf-03",
-    name: "AeroRow Elite",
-    type: "Rowing",
-    status: "connected",
-    lastSync: "15 min ago",
-  },
-  {
-    id: "vf-04",
-    name: "VO2 Edge Sensor",
-    type: "Sensor",
-    status: "error",
-    lastSync: "Key revoked",
-  },
-]);
-
-const statusStyles: Record<
-  (typeof parsedDevices)[number]["status"],
-  { label: string; className: string }
-> = {
-  connected: {
-    label: "Connected",
-    className: "text-emerald-600 bg-emerald-50 border-emerald-200",
-  },
-  pending: {
-    label: "Pending",
-    className: "text-amber-600 bg-amber-50 border-amber-200",
-  },
-  error: {
-    label: "Action needed",
-    className: "text-rose-600 bg-rose-50 border-rose-200",
-  },
+type UserDevice = {
+  id: string;
+  provider: string;
+  terra_user_id: string;
+  status: string | null;
+  last_synced_at: string | null;
+  created_at: string;
 };
 
 export default async function DevicesPage() {
   const user = await requireUser();
+  let devices: UserDevice[] = [];
+
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const supabase = createSupabaseServerClient();
+      const { data } = await supabase
+        .from("user_devices")
+        .select(
+          "id, provider, terra_user_id, status, last_synced_at, created_at"
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      devices = (data as UserDevice[]) ?? [];
+    } catch (error) {
+      console.warn("Unable to load devices list", error);
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -90,44 +59,8 @@ export default async function DevicesPage() {
             {user.email}
           </p>
         </div>
-        <Button className="rounded-full px-6" variant="secondary">
-          Add integration
-        </Button>
       </div>
-
-      <div className="card-surface divide-y divide-border overflow-hidden">
-        {parsedDevices.map((device) => (
-          <article
-            key={device.id}
-            className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-semibold text-slate-500">
-                {device.id}
-              </p>
-              <p className="text-lg font-semibold text-slate-900">
-                {device.name}
-              </p>
-              <p className="text-sm text-muted-foreground">{device.type}</p>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <span
-                className={cn(
-                  "rounded-full border px-3 py-1 font-medium",
-                  statusStyles[device.status].className
-                )}
-              >
-                {statusStyles[device.status].label}
-              </span>
-              <span className="text-muted-foreground">{device.lastSync}</span>
-              <Button variant="ghost" size="sm">
-                View
-              </Button>
-            </div>
-          </article>
-        ))}
-      </div>
-
+      <DeviceManager initialDevices={devices} />
       <div className="card-surface grid gap-4 p-6 md:grid-cols-3">
         {[
           {

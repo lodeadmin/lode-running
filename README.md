@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000) to explore the marketing page, dashboard, and devices center.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Terra ingestion
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/app/api/terra/webhook/route.ts` handles incoming Terra webhooks. Set `TERRA_WEBHOOK_SECRET` plus the standard Terra API credentials in `.env.local` (and Supabase Edge function env) before enabling in production.
+- `supabase/functions/poll-terra/index.ts` is a Supabase Edge Function that polls Terra every 30 days/since last sync for each `user_devices` row with `status='linked'`. It upserts `workouts`, refreshes `last_synced_at`, and records ingestion logs.
 
-## Learn More
+### Scheduling the poller
 
-To learn more about Next.js, take a look at the following resources:
+1. Deploy the function with the Supabase CLI (from the project root):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   supabase functions deploy poll-terra
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Schedule it to run every two hours:
 
-## Deploy on Vercel
+   ```bash
+   supabase cron schedule create poll-terra --schedule "0 */2 * * *" --function poll-terra
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   Adjust the cron expression as needed; the above fires at the top of every second hour.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. To run locally with your `.env.local` values mirrored into Supabase, use:
+
+   ```bash
+   supabase functions serve poll-terra --env-file .env.local
+   ```
+
+## Tech stack
+
+- Next.js 15 App Router, React 19
+- Tailwind CSS 3, shadcn/ui, lucide-icons
+- Supabase Auth, database, edge functions
+- Terra API integration via webhooks + polling

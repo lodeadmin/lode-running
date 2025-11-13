@@ -49,7 +49,7 @@ export function DeviceManager() {
   const [connectLoading, setConnectLoading] = useState(false);
   const [resyncing, setResyncing] = useState<Record<string, boolean>>({});
   const connectWindowRef = useRef<Window | null>(null);
-  const connectPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const connectPollRef = useRef<number | null>(null);
 
   const fetchDevices = useCallback(async () => {
     setLoadingDevices(true);
@@ -78,8 +78,8 @@ export function DeviceManager() {
 
   useEffect(() => {
     return () => {
-      if (connectPollRef.current) {
-        clearInterval(connectPollRef.current);
+      if (connectPollRef.current !== null) {
+        window.clearInterval(connectPollRef.current);
         connectPollRef.current = null;
       }
       connectWindowRef.current?.close();
@@ -122,14 +122,14 @@ export function DeviceManager() {
 
       connectWindowRef.current = popup;
 
-      if (connectPollRef.current) {
-        clearInterval(connectPollRef.current);
+      if (connectPollRef.current !== null) {
+        window.clearInterval(connectPollRef.current);
       }
 
       connectPollRef.current = window.setInterval(() => {
         if (popup.closed) {
-          if (connectPollRef.current) {
-            clearInterval(connectPollRef.current);
+          if (connectPollRef.current !== null) {
+            window.clearInterval(connectPollRef.current);
           }
           connectPollRef.current = null;
           fetchDevices();

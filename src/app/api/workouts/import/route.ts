@@ -46,8 +46,6 @@ const IMPORTABLE_FIELDS = [
   "terra_workout_id",
 ] as const;
 
-type ImportableField = (typeof IMPORTABLE_FIELDS)[number];
-
 const sanitizeNumber = (value: string | undefined) => {
   if (!value) return null;
   const parsed = Number(value);

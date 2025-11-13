@@ -12,8 +12,15 @@ type TerraWebhookEvent = {
   event_type?: string;
   user_id?: string;
   terra_user_id?: string;
-  user?: { user_id?: string };
+  user?: {
+    user_id?: string;
+    reference_id?: string;
+    user_reference?: string;
+    [key: string]: unknown;
+  };
   payload?: Record<string, unknown>;
+  provider?: string;
+  source?: string;
   data?: TerraWorkoutPayload | TerraWorkoutPayload[];
   workout?: TerraWorkoutPayload;
   session?: TerraWorkoutPayload;

@@ -21,21 +21,18 @@ const PAGE_SIZE = 10;
 const ALLOWED_TYPES = ["running", "base"];
 const RUNNING_WORKOUT_TYPE = "running";
 
-const NUMERIC_FIELDS = [
-  "duration_minutes",
-  "distance_km",
-  "calories",
-  "avg_speed_kmh",
-  "avg_pace_min_per_km",
-  "rpe",
-  "avg_heart_rate",
-  "max_heart_rate",
-  "internal_load",
-  "external_load",
-  "total_session_load",
-] as const;
-
-type NumericField = (typeof NUMERIC_FIELDS)[number];
+type NumericField =
+  | "duration_minutes"
+  | "distance_km"
+  | "calories"
+  | "avg_speed_kmh"
+  | "avg_pace_min_per_km"
+  | "rpe"
+  | "avg_heart_rate"
+  | "max_heart_rate"
+  | "internal_load"
+  | "external_load"
+  | "total_session_load";
 
 type WorkoutInsertPayload = {
   user_id: string;

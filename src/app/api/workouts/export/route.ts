@@ -51,6 +51,13 @@ const escapeValue = (value: unknown) => {
   return stringValue;
 };
 
+const asRecord = (row: unknown): Record<string, unknown> => {
+  if (row && typeof row === "object") {
+    return row as Record<string, unknown>;
+  }
+  return {};
+};
+
 export async function GET() {
   const supabase = await createSupabaseServerClient();
   const {
@@ -75,11 +82,10 @@ export async function GET() {
 
   const rows = data ?? [];
   const csvBody = rows
-    .map((row) =>
-      csvHeaders
-        .map((field) => escapeValue((row as Record<string, unknown>)[field]))
-        .join(",")
-    )
+    .map((row) => {
+      const record = asRecord(row);
+      return csvHeaders.map((field) => escapeValue(record[field])).join(",");
+    })
     .join("\n");
 
   const csv = `${csvHeaders.join(",")}\n${csvBody}`;

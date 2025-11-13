@@ -79,10 +79,14 @@ export function AddWorkoutModal({
   }, [closeModal, isOpen]);
 
   useEffect(() => {
-    if (state.ok) {
-      formRef.current?.reset();
-      closeModal();
+    if (!state.ok) {
+      return;
     }
+    formRef.current?.reset();
+    const timeout = window.setTimeout(() => {
+      closeModal();
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [closeModal, state.ok]);
 
   return (

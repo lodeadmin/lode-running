@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Gauge, ShieldCheck, Waves } from "lucide-react";
+import { Gauge, Waves } from "lucide-react";
 
 import { MetricsSummary } from "@/components/reports/metrics-summary";
-import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 

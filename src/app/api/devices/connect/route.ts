@@ -2,8 +2,11 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { syncLast30DaysForDevice } from "@/lib/actions/device-sync";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  createSupabaseAdminClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase/server";
+import { linkDeviceAndSync } from "@/lib/device-link";
 
 const bodySchema = z.object({
   terraUserId: z.string().min(1),
@@ -12,7 +15,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
     error: authError,
@@ -33,57 +36,31 @@ export async function POST(request: Request) {
   }
 
   const { terraUserId, provider, action } = result.data;
+  const normalizedProvider = provider.toLowerCase();
 
-  const baseDevice = {
-    user_id: user.id,
-    terra_user_id: terraUserId,
-    provider,
-    status: action === "connect" ? "pending" : "connected",
-    last_synced_at: action === "connect" ? null : new Date().toISOString(),
-  };
-
-  const { data: deviceRecord, error: upsertError } = await supabase
-    .from("user_devices")
-    .upsert(baseDevice, {
-      onConflict: "user_id,provider",
-    })
-    .select()
-    .single();
-
-  if (upsertError) {
+  const adminSupabase = createSupabaseAdminClient();
+  let deviceResult;
+  try {
+    deviceResult = await linkDeviceAndSync({
+      supabase: adminSupabase,
+      userId: user.id,
+      terraUserId,
+      provider: normalizedProvider,
+      action,
+    });
+  } catch (error) {
     return NextResponse.json(
-      { error: upsertError.message },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to persist device",
+      },
       { status: 500 }
     );
   }
 
-  const syncResult = await syncLast30DaysForDevice({
-    userId: user.id,
-    terraUserId,
-    provider,
-  });
-
-  let latestDevice = deviceRecord;
-  if (syncResult.success) {
-    const { data: refreshedDevice } = await supabase
-      .from("user_devices")
-      .update({
-        status: "connected",
-        last_synced_at: new Date().toISOString(),
-      })
-      .eq("id", deviceRecord.id)
-      .select()
-      .single();
-
-    if (refreshedDevice) {
-      latestDevice = refreshedDevice;
-    }
-  }
-
   revalidatePath("/settings/devices");
 
-  return NextResponse.json({
-    device: latestDevice,
-    sync: syncResult,
-  });
+  return NextResponse.json(deviceResult);
 }

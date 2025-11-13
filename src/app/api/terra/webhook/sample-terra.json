@@ -1,0 +1,1273 @@
+
+// Activity Data
+{
+  "user": {
+    "provider": "GARMIN",
+    "active": true,
+    "scopes": null,
+    "user_id": "\t76bb56b7-eb2e-407b-a115-0a28ed8f47db",
+    "created_at": null,
+    "reference_id": "\t6589658c-07e8-4752-b3fe-5ab130b0a0b7",
+    "last_webhook_update": null
+  },
+  "type": "activity",
+  "data": [
+    {
+      "data_enrichment": {
+        "stress_score": null
+      },
+      "work_data": {
+        "work_kilojoules": null
+      },
+      "calories_data": {
+        "net_activity_calories": 861.2474788269471,
+        "total_burned_calories": 1454.7815557591937,
+        "net_intake_calories": null,
+        "BMR_calories": null,
+        "calorie_samples": []
+      },
+      "energy_data": {
+        "energy_planned_kilojoules": null,
+        "energy_kilojoules": null
+      },
+      "distance_data": {
+        "summary": {
+          "elevation": {
+            "gain_actual_meters": 152.24359192184122,
+            "avg_meters": 73.49665721094225,
+            "gain_planned_meters": null,
+            "min_meters": 26.005438472741616,
+            "loss_actual_meters": 0,
+            "max_meters": 48.88835417267165
+          },
+          "swimming": {
+            "num_strokes": 302,
+            "pool_length_meters": null,
+            "num_laps": 18
+          },
+          "distance_meters": 189.88559630046882,
+          "steps": 3085,
+          "floors_climbed": null
+        },
+        "detailed": {
+          "floors_climbed_samples": [],
+          "elevation_samples": [
+            {
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "elev_meters": 0,
+              "timer_duration_seconds": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:14:00.000000",
+              "elev_meters": 19.43282239009432,
+              "timer_duration_seconds": 14
+            }
+          ]
+        }
+      },
+      "cheat_detection": null,
+      "position_data": {
+        "end_pos_lat_lng_deg": [
+          52.19265529501539,
+          1.4721173451084908
+        ],
+        "position_samples": [
+          {
+            "coords_lat_lng_deg": [
+              52.69233386099223,
+              1.210880192551354
+            ],
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "timer_duration_seconds": 0
+          }
+        ],
+        "start_pos_lat_lng_deg": [
+          52.65007088419701,
+          1.1339301094372707
+        ],
+        "center_pos_lat_lng_deg": [
+          52.610713482342646,
+          0.40658317976126745
+        ]
+      },
+      "power_data": {
+        "power_samples": [
+          {
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "watts": 24.735900064333414,
+            "timer_duration_seconds": 0
+          }
+        ],
+        "avg_watts": 18.505099015314265,
+        "max_watts": 24.702721181566233
+      },
+      "strain_data": {
+        "strain_level": null
+      },
+      "polyline_map_data": {
+        "summary_polyline": null
+      },
+      "device_data": {
+        "hardware_version": null,
+        "software_version": null,
+        "data_provided": [],
+        "activation_timestamp": null,
+        "other_devices": [],
+        "serial_number": "291182",
+        "last_upload_date": null,
+        "name": "Random device name",
+        "manufacturer": "Terra"
+      },
+      "movement_data": {
+        "avg_velocity_meters_per_second": null,
+        "max_velocity_meters_per_second": null,
+        "normalized_speed_meters_per_second": null,
+        "adjusted_max_speed_meters_per_second": null,
+        "max_torque_newton_meters": null,
+        "max_speed_meters_per_second": 14.351017305391299,
+        "torque_samples": [],
+        "max_pace_minutes_per_kilometer": null,
+        "speed_samples": [
+          {
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 13.240597853406266
+          },
+          
+        ],
+        "max_cadence_rpm": 32.539997386414285,
+        "avg_pace_minutes_per_kilometer": null,
+        "avg_speed_meters_per_second": 13.134888406968622,
+        "cadence_samples": [],
+        "avg_cadence_rpm": 47.10499621931933,
+        "avg_torque_newton_meters": null
+      },
+      "active_durations_data": {
+        "activity_seconds": 1428.4351782617762,
+        "low_intensity_seconds": null,
+        "moderate_intensity_seconds": null,
+        "inactivity_seconds": null,
+        "rest_seconds": null,
+        "num_continuous_inactive_periods": null,
+        "standing_hours_count": null,
+        "activity_levels_samples": [],
+        "standing_seconds": null,
+        "vigorous_intensity_seconds": null
+      },
+      "MET_data": {
+        "avg_level": null,
+        "MET_samples": [],
+        "num_high_intensity_minutes": null,
+        "num_low_intensity_minutes": null,
+        "num_inactive_minutes": null,
+        "num_moderate_intensity_minutes": null
+      },
+      "heart_rate_data": {
+        "summary": {
+          "avg_hrv_sdnn": null,
+          "max_hr_bpm": 141.41293992198865,
+          "user_max_hr_bpm": null,
+          "avg_hrv_rmssd": null,
+          "hr_zone_data": [],
+          "min_hr_bpm": 97,
+          "resting_hr_bpm": null,
+          "avg_hr_bpm": 54.486595320771706
+        },
+        "detailed": {
+          "hrv_samples_sdnn": [],
+          "hrv_samples_rmssd": [],
+          "hr_samples": [
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "timer_duration_seconds": 0,
+              "bpm": 149
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:14:00.000000",
+              "timer_duration_seconds": 14,
+              "bpm": 97
+            }
+          ]
+        }
+      },
+      "TSS_data": {
+        "TSS_samples": []
+      },
+      "lap_data": {
+        "laps": []
+      },
+      "oxygen_data": {
+        "vo2max_ml_per_min_per_kg": null,
+        "saturation_samples": [],
+        "vo2_samples": [],
+        "avg_saturation_percentage": null
+      },
+      "metadata": {
+        "country": null,
+        "summary_id": "121756121520",
+        "timestamp_localization": 1,
+        "state": null,
+        "start_time": "2025-11-09T00:00:00.000000",
+        "end_time": "2025-11-09T01:29:00.000000",
+        "type": 48,
+        "name": "Operations - Flying",
+        "city": null,
+        "upload_type": 3
+      }
+    }
+  ]
+}
+
+// Body Data
+{
+  "user": {
+    "provider": "GARMIN",
+    "active": true,
+    "scopes": null,
+    "user_id": "\t76bb56b7-eb2e-407b-a115-0a28ed8f47db",
+    "created_at": null,
+    "reference_id": "\t6589658c-07e8-4752-b3fe-5ab130b0a0b7",
+    "last_webhook_update": null
+  },
+  "type": "activity",
+  "data": [
+    {
+      "data_enrichment": {
+        "stress_score": null
+      },
+      "work_data": {
+        "work_kilojoules": null
+      },
+      "calories_data": {
+        "net_activity_calories": 861.2474788269471,
+        "total_burned_calories": 1454.7815557591937,
+        "net_intake_calories": null,
+        "BMR_calories": null,
+        "calorie_samples": []
+      },
+      "energy_data": {
+        "energy_planned_kilojoules": null,
+        "energy_kilojoules": null
+      },
+      "distance_data": {
+        "summary": {
+          "elevation": {
+            "gain_actual_meters": 152.24359192184122,
+            "avg_meters": 73.49665721094225,
+            "gain_planned_meters": null,
+            "min_meters": 26.005438472741616,
+            "loss_actual_meters": 0,
+            "max_meters": 48.88835417267165
+          },
+          "swimming": {
+            "num_strokes": 302,
+            "pool_length_meters": null,
+            "num_laps": 18
+          },
+          "distance_meters": 189.88559630046882,
+          "steps": 3085,
+          "floors_climbed": null
+        },
+        "detailed": {
+          "floors_climbed_samples": [],
+          "elevation_samples": [
+            {
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "elev_meters": 0,
+              "timer_duration_seconds": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:14:00.000000",
+              "elev_meters": 19.43282239009432,
+              "timer_duration_seconds": 14
+            },
+            {
+              "timestamp": "2025-11-09T00:28:00.000000",
+              "elev_meters": 56.39725005752257,
+              "timer_duration_seconds": 28
+            },
+            {
+              "timestamp": "2025-11-09T00:42:00.000000",
+              "elev_meters": 70.07144971310517,
+              "timer_duration_seconds": 42
+            },
+            {
+              "timestamp": "2025-11-09T00:56:00.000000",
+              "elev_meters": 95.99971290091435,
+              "timer_duration_seconds": 56
+            },
+            {
+              "timestamp": "2025-11-09T01:10:00.000000",
+              "elev_meters": 120.3317734931181,
+              "timer_duration_seconds": 70
+            },
+            {
+              "timestamp": "2025-11-09T01:24:00.000000",
+              "elev_meters": 152.24359192184122,
+              "timer_duration_seconds": 84
+            }
+          ],
+          "step_samples": [],
+          "distance_samples": [
+            {
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "distance_meters": 0,
+              "timer_duration_seconds": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:14:00.000000",
+              "distance_meters": 16.612543746266454,
+              "timer_duration_seconds": 14
+            },
+            {
+              "timestamp": "2025-11-09T00:28:00.000000",
+              "distance_meters": 38.590146015227106,
+              "timer_duration_seconds": 28
+            },
+            {
+              "timestamp": "2025-11-09T00:42:00.000000",
+              "distance_meters": 76.0252115381258,
+              "timer_duration_seconds": 42
+            },
+            {
+              "timestamp": "2025-11-09T00:56:00.000000",
+              "distance_meters": 129.63422245754342,
+              "timer_duration_seconds": 56
+            },
+            {
+              "timestamp": "2025-11-09T01:10:00.000000",
+              "distance_meters": 146.9828998975627,
+              "timer_duration_seconds": 70
+            },
+            {
+              "timestamp": "2025-11-09T01:24:00.000000",
+              "distance_meters": 167.48580047129514,
+              "timer_duration_seconds": 84
+            }
+          ]
+        }
+      },
+      "cheat_detection": null,
+      "position_data": {
+        "end_pos_lat_lng_deg": [
+          52.19265529501539,
+          1.4721173451084908
+        ],
+        "position_samples": [
+          {
+            "coords_lat_lng_deg": [
+              52.69233386099223,
+              1.210880192551354
+            ],
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "timer_duration_seconds": 0
+          },
+          {
+            "coords_lat_lng_deg": [
+              52.78054034386382,
+              0.6345827969501459
+            ],
+            "timestamp": "2025-11-09T00:14:00.000000",
+            "timer_duration_seconds": 14
+          },
+          {
+            "coords_lat_lng_deg": [
+              52.63513650235838,
+              0.3595148850682849
+            ],
+            "timestamp": "2025-11-09T00:28:00.000000",
+            "timer_duration_seconds": 28
+          },
+          {
+            "coords_lat_lng_deg": [
+              52.610713482342646,
+              0.40658317976126745
+            ],
+            "timestamp": "2025-11-09T00:42:00.000000",
+            "timer_duration_seconds": 42
+          },
+          {
+            "coords_lat_lng_deg": [
+              52.74305682428662,
+              1.2045364635046956
+            ],
+            "timestamp": "2025-11-09T00:56:00.000000",
+            "timer_duration_seconds": 56
+          },
+          {
+            "coords_lat_lng_deg": [
+              52.67050618208283,
+              0.7698441409646777
+            ],
+            "timestamp": "2025-11-09T01:10:00.000000",
+            "timer_duration_seconds": 70
+          },
+          {
+            "coords_lat_lng_deg": [
+              52.72217287870436,
+              0.8242814246761017
+            ],
+            "timestamp": "2025-11-09T01:24:00.000000",
+            "timer_duration_seconds": 84
+          }
+        ],
+        "start_pos_lat_lng_deg": [
+          52.65007088419701,
+          1.1339301094372707
+        ],
+        "center_pos_lat_lng_deg": [
+          52.610713482342646,
+          0.40658317976126745
+        ]
+      },
+      "power_data": {
+        "power_samples": [
+          {
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "watts": 24.735900064333414,
+            "timer_duration_seconds": 0
+          },
+          {
+            "timestamp": "2025-11-09T00:14:00.000000",
+            "watts": 28.2591715664456,
+            "timer_duration_seconds": 14
+          },
+          {
+            "timestamp": "2025-11-09T00:28:00.000000",
+            "watts": 23.834331648907344,
+            "timer_duration_seconds": 28
+          },
+          {
+            "timestamp": "2025-11-09T00:42:00.000000",
+            "watts": 11.908807691291548,
+            "timer_duration_seconds": 42
+          },
+          {
+            "timestamp": "2025-11-09T00:56:00.000000",
+            "watts": 35.3993813634659,
+            "timer_duration_seconds": 56
+          },
+          {
+            "timestamp": "2025-11-09T01:10:00.000000",
+            "watts": 11.250375775017016,
+            "timer_duration_seconds": 70
+          },
+          {
+            "timestamp": "2025-11-09T01:24:00.000000",
+            "watts": 10.19231747925772,
+            "timer_duration_seconds": 84
+          }
+        ],
+        "avg_watts": 18.505099015314265,
+        "max_watts": 24.702721181566233
+      },
+      "strain_data": {
+        "strain_level": null
+      },
+      "polyline_map_data": {
+        "summary_polyline": null
+      },
+      "device_data": {
+        "hardware_version": null,
+        "software_version": null,
+        "data_provided": [],
+        "activation_timestamp": null,
+        "other_devices": [],
+        "serial_number": "291182",
+        "last_upload_date": null,
+        "name": "Random device name",
+        "manufacturer": "Terra"
+      },
+      "movement_data": {
+        "avg_velocity_meters_per_second": null,
+        "max_velocity_meters_per_second": null,
+        "normalized_speed_meters_per_second": null,
+        "adjusted_max_speed_meters_per_second": null,
+        "max_torque_newton_meters": null,
+        "max_speed_meters_per_second": 14.351017305391299,
+        "torque_samples": [],
+        "max_pace_minutes_per_kilometer": null,
+        "speed_samples": [
+          {
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 13.240597853406266
+          },
+          {
+            "timestamp": "2025-11-09T00:14:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 8.583284298225188
+          },
+          {
+            "timestamp": "2025-11-09T00:28:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 5.290580528777936
+          },
+          {
+            "timestamp": "2025-11-09T00:42:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 9.95476618519442
+          },
+          {
+            "timestamp": "2025-11-09T00:56:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 5.009171198368884
+          },
+          {
+            "timestamp": "2025-11-09T01:10:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 10.623566227833226
+          },
+          {
+            "timestamp": "2025-11-09T01:24:00.000000",
+            "timer_duration_seconds": null,
+            "speed_meters_per_second": 7.42637227982971
+          }
+        ],
+        "max_cadence_rpm": 32.539997386414285,
+        "avg_pace_minutes_per_kilometer": null,
+        "avg_speed_meters_per_second": 13.134888406968622,
+        "cadence_samples": [],
+        "avg_cadence_rpm": 47.10499621931933,
+        "avg_torque_newton_meters": null
+      },
+      "active_durations_data": {
+        "activity_seconds": 1428.4351782617762,
+        "low_intensity_seconds": null,
+        "moderate_intensity_seconds": null,
+        "inactivity_seconds": null,
+        "rest_seconds": null,
+        "num_continuous_inactive_periods": null,
+        "standing_hours_count": null,
+        "activity_levels_samples": [],
+        "standing_seconds": null,
+        "vigorous_intensity_seconds": null
+      },
+      "MET_data": {
+        "avg_level": null,
+        "MET_samples": [],
+        "num_high_intensity_minutes": null,
+        "num_low_intensity_minutes": null,
+        "num_inactive_minutes": null,
+        "num_moderate_intensity_minutes": null
+      },
+      "heart_rate_data": {
+        "summary": {
+          "avg_hrv_sdnn": null,
+          "max_hr_bpm": 141.41293992198865,
+          "user_max_hr_bpm": null,
+          "avg_hrv_rmssd": null,
+          "hr_zone_data": [],
+          "min_hr_bpm": 97,
+          "resting_hr_bpm": null,
+          "avg_hr_bpm": 54.486595320771706
+        },
+        "detailed": {
+          "hrv_samples_sdnn": [],
+          "hrv_samples_rmssd": [],
+          "hr_samples": [
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "timer_duration_seconds": 0,
+              "bpm": 149
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:14:00.000000",
+              "timer_duration_seconds": 14,
+              "bpm": 97
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:28:00.000000",
+              "timer_duration_seconds": 28,
+              "bpm": 176
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:42:00.000000",
+              "timer_duration_seconds": 42,
+              "bpm": 168
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T00:56:00.000000",
+              "timer_duration_seconds": 56,
+              "bpm": 145
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T01:10:00.000000",
+              "timer_duration_seconds": 70,
+              "bpm": 126
+            },
+            {
+              "context": 0,
+              "timestamp": "2025-11-09T01:24:00.000000",
+              "timer_duration_seconds": 84,
+              "bpm": 174
+            }
+          ]
+        }
+      },
+      "TSS_data": {
+        "TSS_samples": []
+      },
+      "lap_data": {
+        "laps": []
+      },
+      "oxygen_data": {
+        "vo2max_ml_per_min_per_kg": null,
+        "saturation_samples": [],
+        "vo2_samples": [],
+        "avg_saturation_percentage": null
+      },
+      "metadata": {
+        "country": null,
+        "summary_id": "121756121520",
+        "timestamp_localization": 1,
+        "state": null,
+        "start_time": "2025-11-09T00:00:00.000000",
+        "end_time": "2025-11-09T01:29:00.000000",
+        "type": 48,
+        "name": "Operations - Flying",
+        "city": null,
+        "upload_type": 3
+      }
+    }
+  ]
+}
+
+// Daily Data 
+
+{
+  "data": [
+    {
+      "oxygen_data": {
+        "vo2_samples": [],
+        "saturation_samples": [
+          {
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "type": 0,
+            "percentage": 89.60629563015739
+          },
+          {
+            "timestamp": "2025-11-09T00:13:00.000000",
+            "type": 0,
+            "percentage": 84.70927326378087
+          },
+          {
+            "timestamp": "2025-11-09T00:26:00.000000",
+            "type": 0,
+            "percentage": 96.36917317061699
+          },
+          {
+            "timestamp": "2025-11-09T00:39:00.000000",
+            "type": 0,
+            "percentage": 81.50484673835271
+          }
+        ],
+        "avg_saturation_percentage": 89.82467749155094,
+        "vo2max_ml_per_min_per_kg": null
+      },
+      "strain_data": {
+        "strain_level": null
+      },
+      "metadata": {
+        "upload_type": 0,
+        "end_time": "2025-11-09T00:47:00.000000",
+        "start_time": "2025-11-09T00:00:00.000000",
+        "timestamp_localization": 1
+      },
+      "distance_data": {
+        "distance_meters": 12647.025036642903,
+        "floors_climbed": 4,
+        "detailed": {
+          "elevation_samples": [],
+          "distance_samples": [
+            {
+              "distance_meters": 29.036640048277114,
+              "timer_duration_seconds": 0,
+              "timestamp": "2025-11-09T00:00:00.000000"
+            },
+            {
+              "distance_meters": 85.34458956125083,
+              "timer_duration_seconds": 13,
+              "timestamp": "2025-11-09T00:13:00.000000"
+            },
+            {
+              "distance_meters": 127.5001340870814,
+              "timer_duration_seconds": 26,
+              "timestamp": "2025-11-09T00:26:00.000000"
+            },
+            {
+              "distance_meters": 169.03779793438878,
+              "timer_duration_seconds": 39,
+              "timestamp": "2025-11-09T00:39:00.000000"
+            }
+          ],
+          "step_samples": [
+            {
+              "timer_duration_seconds": 0,
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "steps": 59
+            },
+            {
+              "timer_duration_seconds": 13,
+              "timestamp": "2025-11-09T00:13:00.000000",
+              "steps": 246
+            },
+            {
+              "timer_duration_seconds": 26,
+              "timestamp": "2025-11-09T00:26:00.000000",
+              "steps": 651
+            },
+            {
+              "timer_duration_seconds": 39,
+              "timestamp": "2025-11-09T00:39:00.000000",
+              "steps": 1055
+            }
+          ],
+          "floors_climbed_samples": []
+        },
+        "steps": 9778,
+        "elevation": {
+          "gain_actual_meters": null,
+          "avg_meters": null,
+          "min_meters": null,
+          "max_meters": null,
+          "loss_actual_meters": null,
+          "gain_planned_meters": null
+        },
+        "swimming": {
+          "pool_length_meters": null,
+          "num_strokes": null,
+          "num_laps": null
+        }
+      },
+      "data_enrichment": {
+        "cardiovascular_score": null,
+        "respiratory_score": null,
+        "readiness_contributors": null,
+        "immune_contributors": null,
+        "immune_index": null,
+        "start_time": null,
+        "stress_contributors": null,
+        "readiness_score": null,
+        "respiratory_contributors": null,
+        "cardiovascular_contributors": null,
+        "total_stress_score": null
+      },
+      "active_durations_data": {
+        "moderate_intensity_seconds": 2300.5466877789136,
+        "standing_seconds": null,
+        "standing_hours_count": null,
+        "rest_seconds": null,
+        "num_continuous_inactive_periods": null,
+        "low_intensity_seconds": null,
+        "activity_levels_samples": [],
+        "activity_seconds": 313.40276495125966,
+        "inactivity_seconds": 1229.3134475103539,
+        "vigorous_intensity_seconds": 95.36697767930266
+      },
+      "stress_data": {
+        "stress_duration_seconds": 45.67988960609002,
+        "high_stress_duration_seconds": 28.076058828991158,
+        "body_battery_samples": [],
+        "medium_stress_duration_seconds": 2.561617837557773,
+        "avg_stress_level": 2.606158572520525,
+        "stress_rating": null,
+        "samples": [
+          {
+            "level": 8.94975559296606,
+            "timestamp": "2025-11-09T00:00:00.000000"
+          },
+          {
+            "level": 3.1511885106208624,
+            "timestamp": "2025-11-09T00:13:00.000000"
+          },
+          {
+            "level": 8.187897125967204,
+            "timestamp": "2025-11-09T00:26:00.000000"
+          },
+          {
+            "level": 4.672049286440937,
+            "timestamp": "2025-11-09T00:39:00.000000"
+          }
+        ],
+        "low_stress_duration_seconds": 39.44457463091435,
+        "max_stress_level": 4.028928324622486,
+        "rest_stress_duration_seconds": 11.818653336311876,
+        "activity_stress_duration_seconds": 15.343826041219804
+      },
+      "scores": {
+        "recovery": null,
+        "activity": null,
+        "sleep": null,
+        "biological_age": null
+      },
+      "tag_data": {
+        "tags": []
+      },
+      "calories_data": {
+        "BMR_calories": 1227.0737963075555,
+        "total_burned_calories": 1397.462325605723,
+        "net_activity_calories": 611.4553715322174,
+        "calorie_samples": [],
+        "net_intake_calories": 135.9801015910969
+      },
+      "heart_rate_data": {
+        "summary": {
+          "avg_hrv_sdnn": null,
+          "max_hr_bpm": 141.47168497102322,
+          "hr_zone_data": [],
+          "min_hr_bpm": 101.0568680976652,
+          "resting_hr_bpm": 51.758096943019424,
+          "avg_hrv_rmssd": null,
+          "avg_hr_bpm": 62.61028963391616,
+          "user_max_hr_bpm": null
+        },
+        "detailed": {
+          "hr_samples": [
+            {
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "context": 0,
+              "bpm": 106,
+              "timer_duration_seconds": null
+            },
+            {
+              "timestamp": "2025-11-09T00:13:00.000000",
+              "context": 0,
+              "bpm": 164,
+              "timer_duration_seconds": null
+            },
+            {
+              "timestamp": "2025-11-09T00:26:00.000000",
+              "context": 0,
+              "bpm": 145,
+              "timer_duration_seconds": null
+            },
+            {
+              "timestamp": "2025-11-09T00:39:00.000000",
+              "context": 0,
+              "bpm": 126,
+              "timer_duration_seconds": null
+            }
+          ],
+          "hrv_samples_rmssd": [],
+          "hrv_samples_sdnn": []
+        }
+      },
+      "device_data": {
+        "name": null,
+        "software_version": null,
+        "activation_timestamp": null,
+        "manufacturer": null,
+        "data_provided": [],
+        "other_devices": [],
+        "last_upload_date": null,
+        "serial_number": null,
+        "hardware_version": null
+      },
+      "MET_data": {
+        "num_inactive_minutes": null,
+        "num_high_intensity_minutes": null,
+        "num_low_intensity_minutes": null,
+        "avg_level": null,
+        "num_moderate_intensity_minutes": null,
+        "MET_samples": []
+      }
+    }
+  ],
+  "user": {
+    "user_id": "\t76bb56b7-eb2e-407b-a115-0a28ed8f47db",
+    "reference_id": "\t6589658c-07e8-4752-b3fe-5ab130b0a0b7",
+    "created_at": null,
+    "provider": "GARMIN",
+    "active": true,
+    "scopes": null,
+    "last_webhook_update": null
+  },
+  "type": "daily"
+}
+
+// Sleep Data
+{
+  "data": [
+    {
+      "scores": {
+        "sleep": null
+      },
+      "sleep_durations_data": {
+        "hypnogram_samples": [
+          {
+            "timestamp": "2025-11-09T00:00:00.000000",
+            "level": 6
+          },
+          {
+            "timestamp": "2025-11-09T00:11:00.000000",
+            "level": 6
+          },
+          {
+            "timestamp": "2025-11-09T00:22:00.000000",
+            "level": 3
+          },
+          {
+            "timestamp": "2025-11-09T00:33:00.000000",
+            "level": 5
+          },
+          {
+            "timestamp": "2025-11-09T00:44:00.000000",
+            "level": 0
+          },
+          {
+            "timestamp": "2025-11-09T00:55:00.000000",
+            "level": 2
+          },
+          {
+            "timestamp": "2025-11-09T01:06:00.000000",
+            "level": 6
+          },
+          {
+            "timestamp": "2025-11-09T01:17:00.000000",
+            "level": 0
+          }
+        ],
+        "awake": {
+          "sleep_latency_seconds": 341.79663787527136,
+          "num_out_of_bed_events": null,
+          "duration_short_interruption_seconds": null,
+          "wake_up_latency_seconds": 261.9497311476046,
+          "duration_awake_state_seconds": 309.03754599357933,
+          "num_wakeup_events": null,
+          "duration_long_interruption_seconds": null
+        },
+        "asleep": {
+          "duration_REM_sleep_state_seconds": 366.5457662671228,
+          "duration_deep_sleep_state_seconds": 134.46266381516568,
+          "duration_light_sleep_state_seconds": 155.20792085837564,
+          "num_REM_events": null,
+          "duration_asleep_state_seconds": 263.6524566196477
+        },
+        "sleep_efficiency": 61.15599289916523,
+        "other": {
+          "duration_unmeasurable_sleep_seconds": null,
+          "duration_in_bed_seconds": 173.35117475025305
+        }
+      },
+      "device_data": {
+        "last_upload_date": null,
+        "other_devices": [],
+        "activation_timestamp": null,
+        "hardware_version": null,
+        "serial_number": null,
+        "manufacturer": null,
+        "data_provided": [],
+        "name": null,
+        "software_version": null
+      },
+      "respiration_data": {
+        "snoring_data": {
+          "start_time": "2025-11-09T01:17:00.000000",
+          "samples": [
+            {
+              "duration_seconds": 33,
+              "timestamp": "2025-11-09T00:00:00.000000"
+            },
+            {
+              "duration_seconds": 19,
+              "timestamp": "2025-11-09T00:11:00.000000"
+            },
+            {
+              "duration_seconds": 39,
+              "timestamp": "2025-11-09T00:22:00.000000"
+            },
+            {
+              "duration_seconds": 96,
+              "timestamp": "2025-11-09T00:33:00.000000"
+            },
+            {
+              "duration_seconds": 17,
+              "timestamp": "2025-11-09T00:44:00.000000"
+            },
+            {
+              "duration_seconds": 50,
+              "timestamp": "2025-11-09T00:55:00.000000"
+            },
+            {
+              "duration_seconds": 23,
+              "timestamp": "2025-11-09T01:06:00.000000"
+            },
+            {
+              "duration_seconds": 41,
+              "timestamp": "2025-11-09T01:17:00.000000"
+            }
+          ],
+          "num_snoring_events": null,
+          "total_snoring_duration_seconds": null,
+          "end_time": "2025-11-09T01:17:00.000000"
+        },
+        "oxygen_saturation_data": {
+          "start_time": "2025-11-09T01:17:00.000000",
+          "samples": [
+            {
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "percentage": 90,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:11:00.000000",
+              "percentage": 92,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:22:00.000000",
+              "percentage": 99,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:33:00.000000",
+              "percentage": 96,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:44:00.000000",
+              "percentage": 96,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T00:55:00.000000",
+              "percentage": 90,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T01:06:00.000000",
+              "percentage": 99,
+              "type": 0
+            },
+            {
+              "timestamp": "2025-11-09T01:17:00.000000",
+              "percentage": 100,
+              "type": 0
+            }
+          ],
+          "end_time": "2025-11-09T01:17:00.000000",
+          "avg_saturation_percentage": 90
+        },
+        "breaths_data": {
+          "max_breaths_per_min": 11,
+          "start_time": "2025-11-09T01:17:00.000000",
+          "samples": [
+            {
+              "breaths_per_min": 13,
+              "timestamp": "2025-11-09T00:00:00.000000"
+            },
+            {
+              "breaths_per_min": 12,
+              "timestamp": "2025-11-09T00:11:00.000000"
+            },
+            {
+              "breaths_per_min": 10,
+              "timestamp": "2025-11-09T00:22:00.000000"
+            },
+            {
+              "breaths_per_min": 12,
+              "timestamp": "2025-11-09T00:33:00.000000"
+            },
+            {
+              "breaths_per_min": 10,
+              "timestamp": "2025-11-09T00:44:00.000000"
+            },
+            {
+              "breaths_per_min": 15,
+              "timestamp": "2025-11-09T00:55:00.000000"
+            },
+            {
+              "breaths_per_min": 12,
+              "timestamp": "2025-11-09T01:06:00.000000"
+            },
+            {
+              "breaths_per_min": 14,
+              "timestamp": "2025-11-09T01:17:00.000000"
+            }
+          ],
+          "min_breaths_per_min": 14,
+          "avg_breaths_per_min": 11,
+          "end_time": "2025-11-09T01:17:00.000000",
+          "on_demand_reading": null
+        }
+      },
+      "metadata": {
+        "timestamp_localization": 1,
+        "start_time": "2025-11-09T00:00:00.000000",
+        "is_nap": false,
+        "summary_id": null,
+        "upload_type": 0,
+        "end_time": "2025-11-09T07:54:00.000000"
+      },
+      "data_enrichment": {
+        "sleep_contributors": null,
+        "sleep_score": null
+      },
+      "heart_rate_data": {
+        "detailed": {
+          "hrv_samples_rmssd": [
+            {
+              "hrv_rmssd": 56,
+              "timestamp": "2025-11-09T00:00:00.000000"
+            },
+            {
+              "hrv_rmssd": 73,
+              "timestamp": "2025-11-09T00:11:00.000000"
+            },
+            {
+              "hrv_rmssd": 42,
+              "timestamp": "2025-11-09T00:22:00.000000"
+            },
+            {
+              "hrv_rmssd": 96,
+              "timestamp": "2025-11-09T00:33:00.000000"
+            },
+            {
+              "hrv_rmssd": 52,
+              "timestamp": "2025-11-09T00:44:00.000000"
+            },
+            {
+              "hrv_rmssd": 89,
+              "timestamp": "2025-11-09T00:55:00.000000"
+            },
+            {
+              "hrv_rmssd": 95,
+              "timestamp": "2025-11-09T01:06:00.000000"
+            },
+            {
+              "hrv_rmssd": 103,
+              "timestamp": "2025-11-09T01:17:00.000000"
+            }
+          ],
+          "hrv_samples_sdnn": [],
+          "hr_samples": [
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T00:00:00.000000",
+              "bpm": 106,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T00:11:00.000000",
+              "bpm": 84,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T00:22:00.000000",
+              "bpm": 96,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T00:33:00.000000",
+              "bpm": 88,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T00:44:00.000000",
+              "bpm": 114,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T00:55:00.000000",
+              "bpm": 93,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T01:06:00.000000",
+              "bpm": 154,
+              "context": 0
+            },
+            {
+              "timer_duration_seconds": null,
+              "timestamp": "2025-11-09T01:17:00.000000",
+              "bpm": 122,
+              "context": 0
+            }
+          ]
+        },
+        "summary": {
+          "avg_hr_bpm": 77,
+          "avg_hrv_rmssd": 130,
+          "resting_hr_bpm": 76,
+          "user_max_hr_bpm": null,
+          "max_hr_bpm": 62,
+          "min_hr_bpm": 67,
+          "avg_hrv_sdnn": null
+        }
+      },
+      "readiness_data": {
+        "readiness": null,
+        "recovery_level": 0
+      },
+      "temperature_data": {
+        "delta": null
+      }
+    }
+  ],
+  "type": "sleep",
+  "user": {
+    "last_webhook_update": null,
+    "reference_id": "\t6589658c-07e8-4752-b3fe-5ab130b0a0b7",
+    "active": true,
+    "provider": "GARMIN",
+    "user_id": "\t76bb56b7-eb2e-407b-a115-0a28ed8f47db",
+    "created_at": null,
+    "scopes": null
+  }
+}
+
+// Menstruation Data
+
+{
+  "type": "menstruation",
+  "user": {
+    "active": true,
+    "provider": "GARMIN",
+    "reference_id": "\t6589658c-07e8-4752-b3fe-5ab130b0a0b7",
+    "scopes": null,
+    "created_at": null,
+    "last_webhook_update": null,
+    "user_id": "\t76bb56b7-eb2e-407b-a115-0a28ed8f47db"
+  },
+  "data": [
+    {
+      "menstruation_data": {
+        "intervals": [],
+        "menstruation_flow": [],
+        "predicted_cycle_length_days": 26,
+        "period_start_date": "2025-11-09T00:00:00.000000",
+        "day_in_cycle": 7,
+        "current_phase": 3,
+        "length_of_current_phase_days": 1,
+        "fertility_window_end": null,
+        "fertility_window_start": null,
+        "ovulation_day": null,
+        "cycle_length_days": null,
+        "last_updated_time": null,
+        "is_predicted_cycle": null,
+        "period_length_days": 6,
+        "days_until_next_phase": 9
+      },
+      "metadata": {
+        "end_time": "2025-11-09T01:02:00.000000",
+        "timestamp_localization": 1,
+        "start_time": "2025-11-09T00:00:00.000000"
+      }
+    }
+  ]
+}

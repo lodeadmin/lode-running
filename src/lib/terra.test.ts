@@ -21,7 +21,10 @@ describe("verifySignature", () => {
       "terra-signature": signature,
     });
 
-    expect(verifySignature(headers, body, secret)).toBe(true);
+    expect(verifySignature(headers, body, secret)).toMatchObject({
+      valid: true,
+      computed: signature,
+    });
   });
 
   it("returns false for an invalid signature", () => {
@@ -29,23 +32,36 @@ describe("verifySignature", () => {
       "terra-signature": "not-valid",
     });
 
-    expect(verifySignature(headers, "{}", "another_secret")).toBe(false);
+    expect(verifySignature(headers, "{}", "another_secret").valid).toBe(false);
   });
 });
 
 describe("mapTerraWorkoutToRow", () => {
   const payload: TerraWorkoutPayload = {
-    id: "workout-123",
-    start_time: "2025-01-01T10:00:00Z",
-    end_time: "2025-01-01T11:00:00Z",
-    calories: 450,
-    distance: 5000,
-    steps: 6500,
-    average_heart_rate: 140,
-    max_heart_rate: 178,
-    type: "run",
+    metadata: {
+      summary_id: "workout-123",
+      start_time: "2025-01-01T10:00:00Z",
+      end_time: "2025-01-01T11:00:00Z",
+      name: "Morning Run",
+      type: "run",
+    },
+    distance_data: {
+      summary: {
+        distance_meters: 5000,
+        steps: 6500,
+      },
+    },
+    calories_data: { total_burned_calories: 450 },
+    heart_rate_data: {
+      summary: { avg_hr_bpm: 140, max_hr_bpm: 178 },
+    },
+    movement_data: {
+      avg_speed_meters_per_second: 3,
+      max_speed_meters_per_second: 6,
+      avg_pace_minutes_per_kilometer: 5,
+      max_pace_minutes_per_kilometer: 4,
+    },
     source: "fitbit",
-    metadata: { zone_minutes: 30 },
   };
 
   it("maps Terra payloads to workout rows", () => {
@@ -60,15 +76,33 @@ describe("mapTerraWorkoutToRow", () => {
       terra_user_id: "terra-user-1",
       provider: "fitbit",
       user_id: "local-user-42",
-      started_at: payload.start_time,
-      ended_at: payload.end_time,
-      calories: payload.calories,
-      distance_meters: payload.distance,
-      steps: payload.steps,
-      avg_heart_rate: payload.average_heart_rate,
-      max_heart_rate: payload.max_heart_rate,
-      modality: payload.type,
-      source: payload.source,
+      type_of_workout: "Morning Run",
+      week_number: 1,
+      started_at: "2025-01-01T10:00:00Z",
+      ended_at: "2025-01-01T11:00:00Z",
+      duration_minutes: 60,
+      distance_km: 5,
+      calories: 450,
+      distance_meters: 5000,
+      steps: 6500,
+      avg_heart_rate: 140,
+      max_heart_rate: 178,
+      rpe: 7,
+      zl: 52.19,
+      base_el: null,
+      rhr_today: null,
+      hr_max: 178,
+      hr_avg: 140,
+      delta_hr: 38,
+      avg_speed_kmh: 10.8,
+      max_speed_kmh: 21.6,
+      avg_pace_min_per_km: 5,
+      best_pace_min_per_km: 4,
+      internal_load: 47.19,
+      external_load: 5,
+      total_session_load: 52.19,
+      modality: "Morning Run",
+      source: "fitbit",
       raw_payload: payload,
     });
     expect(typeof row.last_synced_at).toBe("string");
@@ -94,5 +128,7 @@ describe("mapTerraWorkoutToRow", () => {
     expect(row.distance_meters).toBeNull();
     expect(row.avg_heart_rate).toBeNull();
     expect(row.modality).toBeNull();
+    expect(row.duration_minutes).toBe(30);
+    expect(row.total_session_load).toBeNull();
   });
 });

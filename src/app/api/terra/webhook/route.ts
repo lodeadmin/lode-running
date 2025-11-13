@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import {
   mapTerraWorkoutToRow,
-  verifySignature,
+  verifyTerraSignature,
   type TerraWorkoutPayload,
 } from "@/lib/terra";
 
@@ -19,17 +19,46 @@ type TerraWebhookEvent = {
   session?: TerraWorkoutPayload;
 };
 
+type DeviceRecord = {
+  id: string;
+  user_id: string;
+  provider: string;
+  terra_user_id?: string | null;
+};
+
+const cleanString = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : null;
+};
+
+const normalizeProvider = (value: unknown): string | null => {
+  const cleaned = cleanString(value);
+  return cleaned ? cleaned.toLowerCase() : null;
+};
+
 export async function POST(request: Request) {
-  const secret = process.env.TERRA_WEBHOOK_SECRET;
-  if (!secret) {
+  if (!process.env.TERRA_WEBHOOK_SECRET) {
     console.error("Terra webhook secret is not configured.");
-    return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Server misconfigured" },
+      { status: 500 }
+    );
   }
 
   const rawBody = await request.text();
-  const isValid = verifySignature(request.headers, rawBody, secret);
+  const signatureHeader = request.headers.get("terra-signature");
+  const verification = verifyTerraSignature(request.headers, rawBody);
+  const isValid = verification.valid;
 
   if (!isValid) {
+    console.warn("Terra webhook signature mismatch", {
+      hasHeader: Boolean(signatureHeader),
+      signatureHeader,
+      bodyLength: rawBody.length,
+      computed: verification.computed,
+      payload: verification.payloadPreview,
+    });
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -58,13 +87,22 @@ export async function POST(request: Request) {
 
 function extractTerraUserId(event: TerraWebhookEvent) {
   return (
-    event.user?.user_id ??
-    event.terra_user_id ??
-    event.user_id ??
-    (typeof event.payload?.["terra_user_id"] === "string"
-      ? (event.payload?.["terra_user_id"] as string)
-      : undefined)
+    cleanString(event.user?.user_id) ??
+    cleanString(event.terra_user_id) ??
+    cleanString(event.user_id) ??
+    cleanString(event.payload?.["terra_user_id"])
   );
+}
+
+function extractUserReference(event: TerraWebhookEvent) {
+  const candidates = [
+    cleanString(event.user?.["reference_id"]),
+    cleanString(event.user?.["user_reference"]),
+    cleanString(event.payload?.["reference_id"]),
+    cleanString(event.payload?.["user_reference"]),
+  ];
+
+  return candidates.find((value) => Boolean(value)) ?? null;
 }
 
 function extractWorkouts(event: TerraWebhookEvent): TerraWorkoutPayload[] {
@@ -97,6 +135,35 @@ function extractWorkouts(event: TerraWebhookEvent): TerraWorkoutPayload[] {
   return workouts;
 }
 
+function extractProviderFromEvent(
+  event: TerraWebhookEvent,
+  workouts: TerraWorkoutPayload[]
+) {
+  const directKeys = [
+    normalizeProvider(event["provider"]),
+    normalizeProvider(event.payload?.["provider"]),
+    normalizeProvider(event.payload?.["source"]),
+  ].filter(Boolean) as string[];
+
+  if (directKeys.length) {
+    return directKeys[0] ?? null;
+  }
+
+  for (const workout of workouts) {
+    const metadataProvider = (workout.metadata as
+      | Record<string, unknown>
+      | undefined)?.["provider"];
+    const candidate = normalizeProvider(
+      workout.source ?? metadataProvider
+    );
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 async function processTerraEvent({
   terraUserId,
   eventType,
@@ -106,28 +173,115 @@ async function processTerraEvent({
   eventType: string;
   event: TerraWebhookEvent;
 }) {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
+  const userReferenceId = extractUserReference(event);
+  const workouts = extractWorkouts(event);
+  const providerHint = extractProviderFromEvent(event, workouts);
 
-  const { data: device } = await supabase
-    .from("user_devices")
-    .select("user_id, provider")
-    .eq("terra_user_id", terraUserId)
-    .maybeSingle();
+  let device: DeviceRecord | null = null;
+
+  if (terraUserId) {
+    const supabase = createSupabaseAdminClient();
+    await supabase.from("ingestion_logs").insert({
+      user_id: null,
+      source: "webhook_debug",
+      payload: event, // Store entire event as JSONB
+      status: "debug",
+      message: `Event type: ${eventType}`,
+    });
+
+    const { data: deviceByTerraId, error } = await supabase
+      .from("user_devices")
+      .select("id, user_id, provider, terra_user_id")
+      .eq("terra_user_id", terraUserId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("Device lookup by terra_user_id failed", error.message, {
+        terraUserId,
+      });
+    }
+
+    device = deviceByTerraId ?? null;
+  }
+
+  if (!device && userReferenceId) {
+    let fallbackQuery = supabase
+      .from("user_devices")
+      .select("id, user_id, provider, terra_user_id")
+      .eq("user_id", userReferenceId);
+
+    if (providerHint) {
+      fallbackQuery = fallbackQuery.eq("provider", providerHint);
+    }
+
+    const { data: deviceByUser, error } = await fallbackQuery
+      .order("connected_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("Device lookup by user_id failed", error.message, {
+        userReferenceId,
+      });
+    } else if (deviceByUser) {
+      if (
+        terraUserId &&
+        deviceByUser.terra_user_id &&
+        deviceByUser.terra_user_id !== terraUserId
+      ) {
+        console.warn("Device terra_user_id mismatch", {
+          stored: deviceByUser.terra_user_id,
+          incoming: terraUserId,
+        });
+      }
+
+      if (terraUserId && deviceByUser.terra_user_id !== terraUserId) {
+        const { error: updateError } = await supabase
+          .from("user_devices")
+          .update({ terra_user_id: terraUserId })
+          .eq("id", deviceByUser.id);
+
+        if (updateError) {
+          console.warn(
+            "Failed to backfill terra_user_id",
+            updateError.message,
+            {
+              deviceId: deviceByUser.id,
+              terraUserId,
+            }
+          );
+        } else {
+          deviceByUser.terra_user_id = terraUserId;
+        }
+      }
+
+      device = deviceByUser;
+    }
+  }
 
   if (!device) {
-    console.warn("No matching device for terra_user_id", { terraUserId });
+    console.warn("No matching device for terra webhook", {
+      terraUserId,
+      userReferenceId,
+      providerHint,
+    });
     await supabase.from("ingestion_logs").insert({
+      user_id: userReferenceId ?? null,
       source: "webhook",
       status: "ignored",
-      message: `No device matched for terra_user_id=${terraUserId}`,
+      message: `No device matched for terra_user_id=${terraUserId} reference=${userReferenceId}`,
     });
     return;
   }
 
-  const workouts = extractWorkouts(event);
   if (!workouts.length) {
-    console.warn("No workout payloads found in Terra webhook", { eventType });
+    console.warn("No workout payloads found in Terra webhook", {
+      eventType,
+      note: "Filtered to Wandsworth Running only",
+    });
     await supabase.from("ingestion_logs").insert({
+      user_id: device.user_id,
       source: "webhook",
       status: "ignored",
       message: `Webhook ${eventType} contained no workouts`,
@@ -137,7 +291,7 @@ async function processTerraEvent({
 
   const rows = workouts.map((payload) =>
     mapTerraWorkoutToRow(payload, {
-      provider: device.provider,
+      provider: providerHint ?? device.provider,
       terraUserId,
       userId: device.user_id,
     })
@@ -153,6 +307,7 @@ async function processTerraEvent({
     : `Upserted ${rows.length} workout(s) via webhook`;
 
   await supabase.from("ingestion_logs").insert({
+    user_id: device.user_id,
     source: "webhook",
     status,
     message,

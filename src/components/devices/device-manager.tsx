@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -12,22 +12,17 @@ type UserDevice = {
   terra_user_id: string;
   status: string | null;
   last_synced_at: string | null;
-  created_at: string;
-};
-
-type DeviceManagerProps = {
-  initialDevices: UserDevice[];
-};
-
-type ConnectResult = {
-  provider: string;
-  terraUserId: string;
+  connected_at: string;
 };
 
 const statusStyles: Record<
-  "connected" | "pending" | "error" | "unknown",
+  "linked" | "connected" | "pending" | "error" | "unknown",
   { label: string; className: string }
 > = {
+  linked: {
+    label: "Linked",
+    className: "text-emerald-600 bg-emerald-50 border-emerald-200",
+  },
   connected: {
     label: "Connected",
     className: "text-emerald-600 bg-emerald-50 border-emerald-200",
@@ -46,82 +41,119 @@ const statusStyles: Record<
   },
 };
 
-export function DeviceManager({ initialDevices }: DeviceManagerProps) {
-  const [devices, setDevices] = useState(initialDevices);
+const RESYNC_WINDOW_DAYS = 7;
+
+export function DeviceManager() {
+  const [devices, setDevices] = useState<UserDevice[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(true);
   const [connectLoading, setConnectLoading] = useState(false);
   const [resyncing, setResyncing] = useState<Record<string, boolean>>({});
+  const connectWindowRef = useRef<Window | null>(null);
+  const connectPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const fetchDevices = useCallback(async () => {
+    setLoadingDevices(true);
+    try {
+      const response = await fetch("/api/devices", { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error("Unable to load devices");
+      }
+      const { devices: rows } = (await response.json()) as {
+        devices: UserDevice[];
+      };
+      setDevices(rows ?? []);
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to load devices."
+      );
+    } finally {
+      setLoadingDevices(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDevices();
+  }, [fetchDevices]);
+
+  useEffect(() => {
+    return () => {
+      if (connectPollRef.current) {
+        clearInterval(connectPollRef.current);
+        connectPollRef.current = null;
+      }
+      connectWindowRef.current?.close();
+    };
+  }, []);
 
   const hasDevices = devices.length > 0;
 
-  async function handleConnect() {
+  const handleConnect = useCallback(async () => {
     setConnectLoading(true);
-    let optimisticId: string | null = null;
     try {
-      const result = await launchTerraConnect();
-      if (!result) {
-        return;
-      }
-
-      optimisticId =
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `temp-${Date.now()}`;
-
-      const optimisticDevice: UserDevice = {
-        id: optimisticId,
-        provider: result.provider,
-        terra_user_id: result.terraUserId,
-        status: "pending",
-        last_synced_at: null,
-        created_at: new Date().toISOString(),
-      };
-
-      setDevices((prev) => [optimisticDevice, ...prev]);
-
-      const response = await fetch("/api/devices/connect", {
+      const response = await fetch("/api/devices/connect/session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          terraUserId: result.terraUserId,
-          provider: result.provider,
-          action: "connect",
-        }),
       });
 
       if (!response.ok) {
-        throw new Error("Unable to connect device");
+        throw new Error("Unable to launch Terra Connect");
       }
 
-      const { device, sync } = await response.json();
+      const session = (await response.json()) as {
+        widgetUrl: string;
+      };
 
-      setDevices((prev) => {
-        const next = prev.filter((d) => d.id !== optimisticId);
-        return [device, ...next];
-      });
+      if (typeof window === "undefined") {
+        return;
+      }
 
-      toast.success(
-        sync?.count
-          ? `Device connected. Imported ${sync.count} workout(s).`
-          : "Device connected. Waiting for first sync."
+      const popup = window.open(
+        session.widgetUrl,
+        "terra-connect",
+        "noopener,width=480,height=720"
+      );
+
+      if (!popup) {
+        throw new Error("Popup blocked. Please enable popups for this site.");
+      }
+
+      connectWindowRef.current = popup;
+
+      if (connectPollRef.current) {
+        clearInterval(connectPollRef.current);
+      }
+
+      connectPollRef.current = window.setInterval(() => {
+        if (popup.closed) {
+          if (connectPollRef.current) {
+            clearInterval(connectPollRef.current);
+          }
+          connectPollRef.current = null;
+          fetchDevices();
+          toast.success(
+            "Finished Terra Connect window. We'll sync workouts as soon as Terra responds."
+          );
+        }
+      }, 1500);
+
+      toast.info(
+        "Finish Terra Connect in the popup. We'll refresh your devices when it closes."
       );
     } catch (error) {
-      console.error(error);
-      if (optimisticId) {
-        setDevices((prev) =>
-          prev.filter((device) => device.id !== optimisticId)
-        );
-      }
       toast.error(
-        error instanceof Error ? error.message : "Failed to connect device."
+        error instanceof Error
+          ? error.message
+          : "Failed to start Terra Connect."
       );
     } finally {
       setConnectLoading(false);
     }
-  }
+  }, [fetchDevices]);
 
-  async function handleResync(device: UserDevice) {
+  const handleResync = useCallback(async (device: UserDevice) => {
     setResyncing((prev) => ({ ...prev, [device.id]: true }));
     try {
       const response = await fetch("/api/devices/connect", {
@@ -143,14 +175,18 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
       setDevices((prev) =>
         prev.map((d) =>
           d.id === device.id
-            ? { ...d, last_synced_at: new Date().toISOString(), status: "connected" }
+            ? {
+                ...d,
+                last_synced_at: new Date().toISOString(),
+                status: "linked",
+              }
             : d
         )
       );
 
       toast.success(
         sync?.count
-          ? `Re-synced ${sync.count} workout(s) from the last 30 days.`
+          ? `Re-synced ${sync.count} workout(s) from the last ${RESYNC_WINDOW_DAYS} days.`
           : "Sync started. We'll populate workouts as soon as Terra responds."
       );
     } catch (error) {
@@ -160,7 +196,7 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
     } finally {
       setResyncing((prev) => ({ ...prev, [device.id]: false }));
     }
-  }
+  }, []);
 
   const tableRows = useMemo(
     () =>
@@ -186,7 +222,7 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
 
             <span
               className={cn(
-                "inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-semibold",
+                "inline-flex w-fit items-center rounded-[5px] border px-3 py-1 text-xs font-semibold",
                 statusMeta.className
               )}
             >
@@ -205,16 +241,18 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
               onClick={() => handleResync(device)}
               disabled={Boolean(resyncing[device.id])}
             >
-              {resyncing[device.id] ? "Syncing…" : "Re-sync last 30 days"}
+              {resyncing[device.id]
+                ? "Syncing…"
+                : `Re-sync last ${RESYNC_WINDOW_DAYS} days`}
             </Button>
           </div>
         );
       }),
-    [devices, resyncing]
+    [devices, resyncing, handleResync]
   );
 
   return (
-    <div className="card-surface">
+    <div className="card-surface rounded-[5px]">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 px-5 py-4">
         <div>
           <p className="text-base font-semibold text-slate-900">
@@ -224,16 +262,20 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
             Manage Terra-linked hardware per provider.
           </p>
         </div>
-        <Button
+        {/* <Button
           onClick={handleConnect}
           disabled={connectLoading}
-          className="rounded-full px-6 font-semibold"
+          className="rounded-[5px] px-6 font-semibold"
         >
-          {connectLoading ? "Launching..." : "Connect Device"}
-        </Button>
+          {connectLoading ? "Launching..." : "Connect Device"} */}
+        {/* </Button> */}
       </div>
 
-      {hasDevices ? (
+      {loadingDevices ? (
+        <div className="px-5 py-12 text-center text-sm text-muted-foreground">
+          Loading devices...
+        </div>
+      ) : hasDevices ? (
         <div>{tableRows}</div>
       ) : (
         <div className="flex flex-col items-center gap-4 px-5 py-12 text-center">
@@ -247,7 +289,7 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
           <Button
             onClick={handleConnect}
             disabled={connectLoading}
-            className="rounded-full px-6"
+            className="rounded-[5px] px-6"
           >
             {connectLoading ? "Launching..." : "Connect Device"}
           </Button>
@@ -255,38 +297,6 @@ export function DeviceManager({ initialDevices }: DeviceManagerProps) {
       )}
     </div>
   );
-}
-
-async function launchTerraConnect(): Promise<ConnectResult | null> {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  window.open(
-    "https://app.tryterra.co/connect",
-    "terra-connect",
-    "noopener,width=420,height=720"
-  );
-
-  const provider =
-    window.prompt("Enter the provider you just linked (e.g. fitbit, garmin):")?.trim() ??
-    "";
-  const terraUserId =
-    window
-      .prompt(
-        "Paste the Terra user ID returned from the connect widget (e.g. terra_user_123)."
-      )
-      ?.trim() ?? "";
-
-  if (!provider || !terraUserId) {
-    toast.info("Terra Connect dismissed before completion.");
-    return null;
-  }
-
-  return {
-    provider: provider.toLowerCase(),
-    terraUserId,
-  };
 }
 
 function formatRelativeTime(dateString: string) {

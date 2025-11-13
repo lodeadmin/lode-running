@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Gauge, ShieldCheck, Waves } from "lucide-react";
 
+import { MetricsSummary } from "@/components/reports/metrics-summary";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Dashboard • Vibe Fitness",
@@ -29,82 +30,92 @@ const readinessCards = [
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+  const { data: workoutsData, error: workoutsError } = await supabase
+    .from("workouts")
+    .select(
+      `
+        terra_workout_id,
+        workout_date,
+        type_of_workout,
+        week_number,
+        duration_minutes,
+        distance_meters,
+        distance_km,
+        calories,
+        steps,
+        avg_heart_rate,
+        max_heart_rate,
+        avg_speed_kmh,
+        max_speed_kmh,
+        avg_pace_min_per_km,
+        rpe,
+        zone1,
+        zone2,
+        zone3,
+        zone4,
+        zone5,
+        internal_load,
+        external_load,
+        total_session_load,
+        modality,
+        provider,
+        source,
+        last_synced_at
+      `
+    )
+    .eq("user_id", user.id)
+    .order("workout_date", { ascending: false })
+    .limit(25);
+
+  if (workoutsError) {
+    console.warn("Failed to load workouts", workoutsError.message);
+  }
+
+  const workouts = workoutsData ?? [];
+  const chartWorkouts = workouts
+    .filter((workout) => {
+      const name = workout.type_of_workout?.toLowerCase() ?? "";
+      return (
+        name.includes("wandsworth running") ||
+        name.includes("wandsworth - base")
+      );
+    })
+    .slice(0, 28);
 
   return (
     <div className="space-y-10">
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div>
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">
-            <ShieldCheck className="size-4 text-primary" />
-            Protected Area
-          </p>
           <h1 className="mt-3 text-3xl font-semibold text-slate-900">
-            Team Command Console
+            Quick Insights and Visuals Center
           </h1>
-          <p className="mt-2 max-w-2xl text-slate-600">
-            This dashboard is gated behind authentication. Plug in Supabase Auth
-            to secure session-aware coaching tools for every athlete.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Signed in as <span className="font-semibold">{user.email}</span>
-          </p>
         </div>
-        <Button asChild className="rounded-full px-6">
-          <Link href="/settings/devices">Review devices</Link>
-        </Button>
       </div>
 
       <section className="grid gap-6 md:grid-cols-2">
-        {readinessCards.map(({ title, metric, delta, description, icon: Icon }) => (
-          <article key={title} className="card-surface space-y-4 p-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-2xl bg-secondary p-2 text-primary">
-                <Icon className="size-5" />
+        {readinessCards.map(
+          ({ title, metric, delta, description, icon: Icon }) => (
+            <article key={title} className="card-surface space-y-4 p-6">
+              <div className="flex items-center gap-3">
+                <div className="rounded-[5px] bg-secondary p-2 text-primary">
+                  <Icon className="size-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">{title}</p>
+                  <p className="text-3xl font-semibold text-slate-900">
+                    {metric}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">{title}</p>
-                <p className="text-3xl font-semibold text-slate-900">
-                  {metric}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm font-medium text-emerald-600">{delta}</p>
-            <p className="text-sm text-slate-500">{description}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="card-surface p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Supabase connection
-            </p>
-            <p className="text-xl font-semibold text-slate-900">
-              {isSupabaseConfigured ? "Ready for real data" : "Awaiting keys"}
-            </p>
-          </div>
-          <Button
-            asChild
-            variant={isSupabaseConfigured ? "default" : "outline"}
-            className="rounded-full"
-          >
-            <Link href="https://supabase.com/dashboard/projects" target="_blank">
-              {isSupabaseConfigured ? "Open project" : "Add env keys"}
-            </Link>
-          </Button>
-        </div>
-        {!isSupabaseConfigured && (
-          <p className="mt-4 text-sm text-slate-500">
-            Set{" "}
-            <span className="font-semibold">
-              NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY
-            </span>{" "}
-            to unlock live metrics, policy-enforced row level security, and
-            streaming device data.
-          </p>
+              <p className="text-sm font-medium text-emerald-600">{delta}</p>
+              <p className="text-sm text-slate-500">{description}</p>
+            </article>
+          )
         )}
       </section>
+
+      <MetricsSummary workouts={chartWorkouts} />
     </div>
   );
 }

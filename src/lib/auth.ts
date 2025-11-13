@@ -11,7 +11,7 @@ export async function getCurrentUser(): Promise<User | null> {
     return null;
   }
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
 
   if (error) {

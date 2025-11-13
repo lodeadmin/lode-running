@@ -41,7 +41,8 @@ const statusStyles: Record<
   },
 };
 
-const RESYNC_WINDOW_DAYS = 7;
+const RESYNC_WINDOW_DAYS = 28;
+const RESYNC_WINDOW_WEEKS = RESYNC_WINDOW_DAYS / 7;
 
 export function DeviceManager() {
   const [devices, setDevices] = useState<UserDevice[]>([]);
@@ -186,7 +187,7 @@ export function DeviceManager() {
 
       toast.success(
         sync?.count
-          ? `Re-synced ${sync.count} workout(s) from the last ${RESYNC_WINDOW_DAYS} days.`
+          ? `Re-synced ${sync.count} workout(s) from the last ${RESYNC_WINDOW_WEEKS} week(s).`
           : "Sync started. We'll populate workouts as soon as Terra responds."
       );
     } catch (error) {
@@ -243,7 +244,7 @@ export function DeviceManager() {
             >
               {resyncing[device.id]
                 ? "Syncing…"
-                : `Re-sync last ${RESYNC_WINDOW_DAYS} days`}
+                : `Re-sync last ${RESYNC_WINDOW_WEEKS} weeks`}
             </Button>
           </div>
         );

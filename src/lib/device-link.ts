@@ -57,7 +57,7 @@ export async function linkDeviceAndSync({
     count: 0,
   };
 
-  const syncWindowDays = action === "resync" ? 7 : 28;
+  const syncWindowDays = action === "resync" ? 28 : 28;
   const payloads = await fetchRecentWorkouts({
     terraUserId,
     provider: normalizedProvider,

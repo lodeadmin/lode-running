@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 export type ReportWorkout = {
   terra_workout_id: string | null;
@@ -92,6 +93,7 @@ export function ReportsTable({ workouts }: ReportsTableProps) {
             <TableHead className="text-center text-white text-xs">Internal Load</TableHead>
             <TableHead className="text-center text-white text-xs">External Load</TableHead>
             <TableHead className="text-center text-white text-xs">Session Load</TableHead>
+            <TableHead className="text-center text-white text-xs">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -138,6 +140,16 @@ export function ReportsTable({ workouts }: ReportsTableProps) {
               </TableCell>
               <TableCell className="text-right font-semibold text-slate-900">
                 {formatNumber(workout.total_session_load)}
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center justify-end gap-2">
+                  <Button variant="outline" size="sm">
+                    Edit
+                  </Button>
+                  <Button variant="destructive" size="sm">
+                    Delete
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

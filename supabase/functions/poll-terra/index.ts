@@ -473,6 +473,7 @@ function mapTerraWorkoutToRow(
     steps,
     avg_heart_rate: avgHeartRate,
     max_heart_rate: maxHeartRate,
+    rhr: restingHeartRate,
     rpe,
     zone1: zoneDurations[0],
     zone2: zoneDurations[1],

@@ -13,6 +13,7 @@ const csvHeaders = [
   "steps",
   "rpe",
   "avg_heart_rate",
+  "rhr",
   "max_heart_rate",
   "avg_speed_kmh",
   "max_speed_kmh",

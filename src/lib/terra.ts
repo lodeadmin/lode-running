@@ -93,6 +93,7 @@ export type WorkoutInsert = {
   steps: number | null;
   avg_heart_rate: number | null;
   max_heart_rate: number | null;
+  rhr: number | null;
   rpe: number | null;
   zone1: number | null;
   zone2: number | null;
@@ -603,6 +604,7 @@ export function mapTerraWorkoutToRow(
     steps,
     avg_heart_rate: avgHeartRate,
     max_heart_rate: maxHeartRate,
+    rhr: restingHeartRate,
     rpe,
     zone1: zoneDurations[0],
     zone2: zoneDurations[1],

@@ -65,6 +65,13 @@ export const WORKOUT_FIELDS: FieldConfig[] = [
     placeholder: "e.g. 145",
   },
   {
+    name: "rhr",
+    label: "RHR (resting heart rate)",
+    type: "number",
+    step: "1",
+    placeholder: "e.g. 55",
+  },
+  {
     name: "max_heart_rate",
     label: "Max Heart Rate",
     type: "number",

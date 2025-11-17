@@ -46,8 +46,12 @@ const formatMinutes = (minutes: number | null) => {
   return mins ? `${hrs}h ${mins}m` : `${hrs}h`;
 };
 
-const formatNumber = (value: number | null, suffix = "") => {
-  if (value === null || Number.isNaN(value)) return "—";
+const formatNumber = (
+  value: number | null,
+  suffix = "",
+  emptyValue = "—"
+) => {
+  if (value === null || Number.isNaN(value)) return emptyValue;
   return `${value}${suffix}`;
 };
 
@@ -91,6 +95,7 @@ export function ReportsTable({
               <TableHead className="text-center text-white text-xs">Avg Pace</TableHead>
               <TableHead className="text-center text-white text-xs">RPE</TableHead>
               <TableHead className="text-center text-white text-xs">Avg HR</TableHead>
+              <TableHead className="text-center text-white text-xs">RHR</TableHead>
               <TableHead className="text-center text-white text-xs">Max HR</TableHead>
               <TableHead className="text-center text-white text-xs">Internal Load</TableHead>
               <TableHead className="text-center text-white text-xs">External Load</TableHead>
@@ -135,6 +140,9 @@ export function ReportsTable({
                 </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(workout.avg_heart_rate, " bpm")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.rhr, " bpm", "N/A")}
                 </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(workout.max_heart_rate, " bpm")}

@@ -28,6 +28,7 @@ type NumericField =
   | "avg_speed_kmh"
   | "avg_pace_min_per_km"
   | "rpe"
+  | "rhr"
   | "avg_heart_rate"
   | "max_heart_rate"
   | "internal_load"
@@ -109,6 +110,7 @@ async function addWorkoutAction(
     avg_speed_kmh: readNumberField(formData, "avg_speed_kmh"),
     avg_pace_min_per_km: readNumberField(formData, "avg_pace_min_per_km"),
     rpe: readNumberField(formData, "rpe"),
+    rhr: readNumberField(formData, "rhr"),
     avg_heart_rate: readNumberField(formData, "avg_heart_rate"),
     max_heart_rate: readNumberField(formData, "max_heart_rate"),
     internal_load: readNumberField(formData, "internal_load"),
@@ -166,6 +168,7 @@ async function updateWorkoutAction(
     avg_speed_kmh: readNumberField(formData, "avg_speed_kmh"),
     avg_pace_min_per_km: readNumberField(formData, "avg_pace_min_per_km"),
     rpe: readNumberField(formData, "rpe"),
+    rhr: readNumberField(formData, "rhr"),
     avg_heart_rate: readNumberField(formData, "avg_heart_rate"),
     max_heart_rate: readNumberField(formData, "max_heart_rate"),
     internal_load: readNumberField(formData, "internal_load"),
@@ -246,6 +249,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         avg_speed_kmh,
         avg_pace_min_per_km,
         rpe,
+        rhr,
         avg_heart_rate,
         max_heart_rate,
         internal_load,

@@ -21,6 +21,7 @@ export type ReportWorkout = {
   avg_speed_kmh: number | null;
   avg_pace_min_per_km: number | null;
   rpe: number | null;
+  rhr: number | null;
   avg_heart_rate: number | null;
   max_heart_rate: number | null;
   internal_load: number | null;

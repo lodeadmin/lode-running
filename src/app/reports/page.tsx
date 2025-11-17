@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
-import { ReportsTable, type ReportWorkout } from "@/components/reports/reports-table";
+import { ReportsTable } from "@/components/reports/reports-table";
 import { AddWorkoutModal } from "@/components/reports/add-workout-modal";
 import { BulkUploadButton } from "@/components/reports/bulk-upload-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { AddWorkoutFormState } from "@/components/reports/types";
+import type { AddWorkoutFormState, ReportWorkout } from "@/components/reports/types";
 import { Download } from "lucide-react";
 import { computeIsoWeekNumber, metersFromKilometers } from "@/lib/workouts";
 
@@ -64,6 +64,24 @@ const buildPageUrl = (page: number, query: string) => {
   return `/reports?${params.toString()}`;
 };
 
+const readStringField = (formData: FormData, key: string) => {
+  const value = formData.get(key);
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+const readNumberField = (formData: FormData, key: NumericField) => {
+  const value = formData.get(key);
+  if (value === null) {
+    return null;
+  }
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 async function addWorkoutAction(
   _prevState: AddWorkoutFormState,
   formData: FormData
@@ -73,47 +91,29 @@ async function addWorkoutAction(
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
-  const getString = (key: string) => {
-    const value = formData.get(key);
-    if (typeof value !== "string") {
-      return null;
-    }
-    const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
-  };
-
-  const getNumber = (key: NumericField) => {
-    const value = formData.get(key);
-    if (value === null) {
-      return null;
-    }
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  };
-
-  const workoutDate = getString("workout_date");
+  const workoutDate = readStringField(formData, "workout_date");
   const weekNumber = computeIsoWeekNumber(workoutDate);
-  const distanceKm = getNumber("distance_km");
+  const distanceKm = readNumberField(formData, "distance_km");
   const derivedMeters = metersFromKilometers(distanceKm);
 
   const payload: WorkoutInsertPayload = {
     user_id: user.id,
-    terra_workout_id: getString("terra_workout_id"),
+    terra_workout_id: readStringField(formData, "terra_workout_id"),
     workout_date: workoutDate,
     type_of_workout: RUNNING_WORKOUT_TYPE,
     week_number: weekNumber,
     distance_km: distanceKm,
     distance_meters: derivedMeters,
-    duration_minutes: getNumber("duration_minutes"),
-    calories: getNumber("calories"),
-    avg_speed_kmh: getNumber("avg_speed_kmh"),
-    avg_pace_min_per_km: getNumber("avg_pace_min_per_km"),
-    rpe: getNumber("rpe"),
-    avg_heart_rate: getNumber("avg_heart_rate"),
-    max_heart_rate: getNumber("max_heart_rate"),
-    internal_load: getNumber("internal_load"),
-    external_load: getNumber("external_load"),
-    total_session_load: getNumber("total_session_load"),
+    duration_minutes: readNumberField(formData, "duration_minutes"),
+    calories: readNumberField(formData, "calories"),
+    avg_speed_kmh: readNumberField(formData, "avg_speed_kmh"),
+    avg_pace_min_per_km: readNumberField(formData, "avg_pace_min_per_km"),
+    rpe: readNumberField(formData, "rpe"),
+    avg_heart_rate: readNumberField(formData, "avg_heart_rate"),
+    max_heart_rate: readNumberField(formData, "max_heart_rate"),
+    internal_load: readNumberField(formData, "internal_load"),
+    external_load: readNumberField(formData, "external_load"),
+    total_session_load: readNumberField(formData, "total_session_load"),
   };
 
   const { error } = await supabase.from("workouts").insert(payload);
@@ -134,6 +134,92 @@ async function addWorkoutAction(
   };
 }
 
+async function updateWorkoutAction(
+  _prevState: AddWorkoutFormState,
+  formData: FormData
+): Promise<AddWorkoutFormState> {
+  "use server";
+
+  const idValue = formData.get("id");
+  if (typeof idValue !== "string" || !idValue) {
+    return {
+      ok: false,
+      message: "Missing workout identifier.",
+    };
+  }
+
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const workoutDate = readStringField(formData, "workout_date");
+  const weekNumber = computeIsoWeekNumber(workoutDate);
+  const distanceKm = readNumberField(formData, "distance_km");
+  const derivedMeters = metersFromKilometers(distanceKm);
+
+  const payload = {
+    workout_date: workoutDate,
+    week_number: weekNumber,
+    distance_km: distanceKm,
+    distance_meters: derivedMeters,
+    duration_minutes: readNumberField(formData, "duration_minutes"),
+    calories: readNumberField(formData, "calories"),
+    avg_speed_kmh: readNumberField(formData, "avg_speed_kmh"),
+    avg_pace_min_per_km: readNumberField(formData, "avg_pace_min_per_km"),
+    rpe: readNumberField(formData, "rpe"),
+    avg_heart_rate: readNumberField(formData, "avg_heart_rate"),
+    max_heart_rate: readNumberField(formData, "max_heart_rate"),
+    internal_load: readNumberField(formData, "internal_load"),
+    external_load: readNumberField(formData, "external_load"),
+    total_session_load: readNumberField(formData, "total_session_load"),
+  };
+
+  const { error } = await supabase
+    .from("workouts")
+    .update(payload)
+    .eq("id", idValue)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Failed to update workout", error.message);
+    return {
+      ok: false,
+      message: "Unable to update workout. Please verify the values and try again.",
+    };
+  }
+
+  revalidatePath("/reports");
+
+  return {
+    ok: true,
+    message: "Workout updated successfully.",
+  };
+}
+
+async function deleteWorkoutAction(formData: FormData): Promise<void> {
+  "use server";
+
+  const idValue = formData.get("id");
+  if (typeof idValue !== "string" || !idValue) {
+    return;
+  }
+
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase
+    .from("workouts")
+    .delete()
+    .eq("id", idValue)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Failed to delete workout", error.message);
+    return;
+  }
+
+  revalidatePath("/reports");
+}
+
 export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
@@ -148,6 +234,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     .from("workouts")
     .select(
       `
+        id,
         terra_workout_id,
         workout_date,
         type_of_workout,
@@ -233,7 +320,11 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
           </Button>
         </div>
       </div>
-      <ReportsTable workouts={workouts} />
+      <ReportsTable
+        workouts={workouts}
+        updateWorkoutAction={updateWorkoutAction}
+        deleteWorkoutAction={deleteWorkoutAction}
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">

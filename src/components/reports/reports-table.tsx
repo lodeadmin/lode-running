@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -9,28 +12,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import type { AddWorkoutFormState, ReportWorkout } from "@/components/reports/types";
+import { EditWorkoutModal } from "@/components/reports/edit-workout-modal";
 
-export type ReportWorkout = {
-  terra_workout_id: string | null;
-  workout_date: string;
-  type_of_workout: string | null;
-  week_number: number | null;
-  duration_minutes: number | null;
-  distance_km: number | null;
-  distance_meters: number | null;
-  calories: number | null;
-  avg_speed_kmh: number | null;
-  avg_pace_min_per_km: number | null;
-  rpe: number | null;
-  avg_heart_rate: number | null;
-  max_heart_rate: number | null;
-  internal_load: number | null;
-  external_load: number | null;
-  total_session_load: number | null;
-};
+type UpdateWorkoutAction = (
+  prevState: AddWorkoutFormState,
+  formData: FormData
+) => Promise<AddWorkoutFormState>;
+
+type DeleteWorkoutAction = (formData: FormData) => Promise<void>;
 
 type ReportsTableProps = {
   workouts: ReportWorkout[];
+  updateWorkoutAction: UpdateWorkoutAction;
+  deleteWorkoutAction: DeleteWorkoutAction;
 };
 
 const formatDate = (value: string) => {
@@ -65,7 +60,13 @@ const formatDistance = (km: number | null, metersFallback: number | null) => {
   return `${derivedKm.toFixed(derivedKm >= 10 ? 0 : 2)} km`;
 };
 
-export function ReportsTable({ workouts }: ReportsTableProps) {
+export function ReportsTable({
+  workouts,
+  updateWorkoutAction,
+  deleteWorkoutAction,
+}: ReportsTableProps) {
+  const [editingWorkout, setEditingWorkout] = useState<ReportWorkout | null>(null);
+
   if (!workouts.length) {
     return (
       <div className="rounded-[5px] border border-dashed border-muted-foreground/30 px-4 py-10 text-center text-sm text-muted-foreground">
@@ -75,86 +76,128 @@ export function ReportsTable({ workouts }: ReportsTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-primary hover:bg-primary  ">
-            <TableHead className="text-white text-xs">Date</TableHead>
-            <TableHead className="text-white text-xs">Workout</TableHead>
-            <TableHead className="text-center text-white text-xs">Week #</TableHead>
-            <TableHead className="text-center text-white text-xs">Duration</TableHead>
-            <TableHead className="text-center text-white text-xs">Distance</TableHead>
-            <TableHead className="text-center text-white text-xs">Calories</TableHead>
-            <TableHead className="text-center text-white text-xs">Avg Speed</TableHead>
-            <TableHead className="text-center text-white text-xs">Avg Pace</TableHead>
-            <TableHead className="text-center text-white text-xs">RPE</TableHead>
-            <TableHead className="text-center text-white text-xs">Avg HR</TableHead>
-            <TableHead className="text-center text-white text-xs">Max HR</TableHead>
-            <TableHead className="text-center text-white text-xs">Internal Load</TableHead>
-            <TableHead className="text-center text-white text-xs">External Load</TableHead>
-            <TableHead className="text-center text-white text-xs">Session Load</TableHead>
-            <TableHead className="text-center text-white text-xs">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {workouts.map((workout) => (
-            <TableRow key={workout.terra_workout_id ?? `${workout.workout_date}-${workout.type_of_workout ?? "unknown"}`}>
-              <TableCell className="font-medium text-slate-900">
-                {formatDate(workout.workout_date)}
-              </TableCell>
-              <TableCell className="capitalize">
-                {workout.type_of_workout ?? "—"}
-              </TableCell>
-              <TableCell className="text-center">
-                {workout.week_number ?? "—"}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatMinutes(workout.duration_minutes)}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatDistance(workout.distance_km, workout.distance_meters)}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.calories, " kcal")}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.avg_speed_kmh, " km/h")}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.avg_pace_min_per_km, " min/km")}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.rpe)}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.avg_heart_rate, " bpm")}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.max_heart_rate, " bpm")}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.internal_load)}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatNumber(workout.external_load)}
-              </TableCell>
-              <TableCell className="text-right font-semibold text-slate-900">
-                {formatNumber(workout.total_session_load)}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center justify-end gap-2">
-                  <Button variant="outline" size="sm">
-                    Edit
-                  </Button>
-                  <Button variant="destructive" size="sm">
-                    Delete
-                  </Button>
-                </div>
-              </TableCell>
+    <>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-primary hover:bg-primary">
+              <TableHead className="text-white text-xs">Date</TableHead>
+              <TableHead className="text-white text-xs">Workout</TableHead>
+              <TableHead className="text-center text-white text-xs">Week #</TableHead>
+              <TableHead className="text-center text-white text-xs">Duration</TableHead>
+              <TableHead className="text-center text-white text-xs">Distance</TableHead>
+              <TableHead className="text-center text-white text-xs">Calories</TableHead>
+              <TableHead className="text-center text-white text-xs">Avg Speed</TableHead>
+              <TableHead className="text-center text-white text-xs">Avg Pace</TableHead>
+              <TableHead className="text-center text-white text-xs">RPE</TableHead>
+              <TableHead className="text-center text-white text-xs">Avg HR</TableHead>
+              <TableHead className="text-center text-white text-xs">Max HR</TableHead>
+              <TableHead className="text-center text-white text-xs">Internal Load</TableHead>
+              <TableHead className="text-center text-white text-xs">External Load</TableHead>
+              <TableHead className="text-center text-white text-xs">Session Load</TableHead>
+              <TableHead className="text-center text-white text-xs">Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {workouts.map((workout) => (
+              <TableRow
+                key={
+                  workout.terra_workout_id ??
+                  `${workout.id}-${workout.workout_date}-${workout.type_of_workout ?? "unknown"}`
+                }
+              >
+                <TableCell className="font-medium text-slate-900">
+                  {formatDate(workout.workout_date)}
+                </TableCell>
+                <TableCell className="capitalize">
+                  {workout.type_of_workout ?? "—"}
+                </TableCell>
+                <TableCell className="text-center">
+                  {workout.week_number ?? "—"}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatMinutes(workout.duration_minutes)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatDistance(workout.distance_km, workout.distance_meters)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.calories, " kcal")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.avg_speed_kmh, " km/h")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.avg_pace_min_per_km, " min/km")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.rpe)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.avg_heart_rate, " bpm")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.max_heart_rate, " bpm")}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.internal_load)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatNumber(workout.external_load)}
+                </TableCell>
+                <TableCell className="text-right font-semibold text-slate-900">
+                  {formatNumber(workout.total_session_load)}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-slate-600 hover:bg-slate-100 hover:text-primary"
+                      aria-label="Edit workout"
+                      onClick={() => setEditingWorkout(workout)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <form
+                      action={deleteWorkoutAction}
+                      onSubmit={(event) => {
+                        if (
+                          !window.confirm(
+                            `Delete workout from ${formatDate(workout.workout_date)}?`
+                          )
+                        ) {
+                          event.preventDefault();
+                        }
+                      }}
+                    >
+                      <input type="hidden" name="id" value={workout.id} />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Delete workout"
+                        className="text-slate-600 hover:bg-slate-100 hover:text-destructive"
+                        type="submit"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </form>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {editingWorkout && (
+        <EditWorkoutModal
+          workout={editingWorkout}
+          updateWorkoutAction={updateWorkoutAction}
+          onClose={() => setEditingWorkout(null)}
+        />
+      )}
+    </>
   );
 }

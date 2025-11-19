@@ -2,6 +2,8 @@
 import { serve } from "https://deno.land/std@0.223.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.3";
 
+import { computeWorkoutLoad } from "../../../../src/lib/training-load.ts";
+
 type UserDevice = {
   id: string;
   user_id: string;
@@ -366,12 +368,6 @@ function mapTerraWorkoutToRow(
   const restingHeartRate = toNumber(heartSummary["resting_hr_bpm"]);
   const hrMax = maxHeartRate ?? toNumber(heartSummary["user_max_hr_bpm"]);
   const hrAvg = avgHeartRate;
-  const deltaHr =
-    hrMax !== null && restingHeartRate !== null
-      ? hrMax - restingHeartRate
-      : hrMax !== null && hrAvg !== null
-        ? hrMax - hrAvg
-        : null;
 
   const rpe =
     hrAvg !== null ? clampNumber(Math.round(hrAvg / 20), 1, 10) : null;
@@ -405,24 +401,6 @@ function mapTerraWorkoutToRow(
     }
   });
 
-  const internalLoad =
-    durationMinutes !== null && hrAvg !== null
-      ? roundNumber(durationMinutes * (hrAvg / (hrMax ?? 190)))
-      : calories !== null
-        ? roundNumber(calories)
-        : null;
-  const externalLoad = distanceKm !== null ? roundNumber(distanceKm) : null;
-
-  const totalSessionLoad = (() => {
-    const sum =
-      (internalLoad ?? 0) + (externalLoad ?? 0) > 0
-        ? (internalLoad ?? 0) + (externalLoad ?? 0)
-        : null;
-    return sum !== null
-      ? roundNumber(sum)
-      : internalLoad ?? externalLoad ?? calories ?? null;
-  })();
-
   const rawAvgSpeedMps = toNumber(
     movementSummary["avg_speed_meters_per_second"]
   );
@@ -455,6 +433,22 @@ function mapTerraWorkoutToRow(
 
   const source =
     pickText(payload.source, metadata["source"], meta.provider) ?? meta.provider;
+
+  const loadMetrics = computeWorkoutLoad({
+    distance_km: distanceKm,
+    distance_meters: distanceMeters,
+    duration_minutes: durationMinutes,
+    avg_speed_kmh: avgSpeedKmh,
+    avg_heart_rate: avgHeartRate,
+    max_heart_rate: maxHeartRate,
+    rhr: restingHeartRate,
+    sex: null,
+  });
+  const deltaHr = loadMetrics.delta_hr;
+  const internalLoad = loadMetrics.internal_load;
+  const externalLoad = loadMetrics.external_load;
+  const totalSessionLoad =
+    loadMetrics.total_session_load ?? internalLoad ?? externalLoad ?? calories ?? null;
 
   return {
     terra_workout_id: terraWorkoutId,

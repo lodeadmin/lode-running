@@ -1,30 +1,12 @@
 import type { Metadata } from "next";
-import { Gauge, Waves } from "lucide-react";
-
-import { MetricsSummary } from "@/components/reports/metrics-summary";
+import { AcwrDashboard } from "@/components/dashboard/acwr-dashboard";
 import { requireUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { summarizeTrainingLoad } from "@/lib/acwr";
 
 export const metadata: Metadata = {
   title: "Dashboard • Vibe Fitness",
 };
-
-const readinessCards = [
-  {
-    title: "Strain balance",
-    metric: "Low",
-    delta: "+2% vs yesterday",
-    description: "Ideal window for progressive overload.",
-    icon: Waves,
-  },
-  {
-    title: "Recovery trend",
-    metric: "78%",
-    delta: "+6 pts week over week",
-    description: "Based on HRV + deep sleep signals.",
-    icon: Gauge,
-  },
-];
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -44,6 +26,8 @@ export default async function DashboardPage() {
         steps,
         avg_heart_rate,
         max_heart_rate,
+        rhr,
+        sex,
         avg_speed_kmh,
         max_speed_kmh,
         avg_pace_min_per_km,
@@ -64,22 +48,25 @@ export default async function DashboardPage() {
     )
     .eq("user_id", user.id)
     .order("workout_date", { ascending: false })
-    .limit(25);
+    .limit(200);
 
   if (workoutsError) {
     console.warn("Failed to load workouts", workoutsError.message);
   }
 
   const workouts = workoutsData ?? [];
-  const chartWorkouts = workouts
-    .filter((workout) => {
-      const name = workout.type_of_workout?.toLowerCase() ?? "";
-      return (
-        name.includes("wandsworth running") ||
-        name.includes("wandsworth - base")
-      );
-    })
-    .slice(0, 28);
+  const loadInputs = workouts.map((workout) => ({
+    workout_date: workout.workout_date,
+    distance_km: workout.distance_km,
+    distance_meters: workout.distance_meters,
+    duration_minutes: workout.duration_minutes,
+    avg_speed_kmh: workout.avg_speed_kmh,
+    avg_heart_rate: workout.avg_heart_rate,
+    max_heart_rate: workout.max_heart_rate,
+    rhr: workout.rhr,
+    sex: workout.sex,
+  }));
+  const trainingSummary = summarizeTrainingLoad(loadInputs);
 
   return (
     <div className="space-y-10">
@@ -91,29 +78,12 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <section className="grid gap-6 md:grid-cols-2">
-        {readinessCards.map(
-          ({ title, metric, delta, description, icon: Icon }) => (
-            <article key={title} className="card-surface space-y-4 p-6">
-              <div className="flex items-center gap-3">
-                <div className="rounded-[5px] bg-secondary p-2 text-primary">
-                  <Icon className="size-5" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">{title}</p>
-                  <p className="text-3xl font-semibold text-slate-900">
-                    {metric}
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-emerald-600">{delta}</p>
-              <p className="text-sm text-slate-500">{description}</p>
-            </article>
-          )
-        )}
-      </section>
-
-      <MetricsSummary workouts={chartWorkouts} />
+      <AcwrDashboard
+        summary={trainingSummary.summary}
+        weeklyLoad={trainingSummary.weeklyLoad}
+        acwrHistory={trainingSummary.acwrHistory}
+        suggestions={trainingSummary.suggestions}
+      />
     </div>
   );
 }

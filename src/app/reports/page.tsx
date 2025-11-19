@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 const PAGE_SIZE = 10;
-const ALLOWED_TYPES = ["running", "base"];
+const ALLOWED_TYPES = ["running", "run", "base"];
 const RUNNING_WORKOUT_TYPE = "running";
 
 type NumericField =

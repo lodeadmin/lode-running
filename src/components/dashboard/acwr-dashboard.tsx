@@ -37,6 +37,8 @@ const toneClasses: Record<AcwrSummary["status"]["tone"], string> = {
   muted: "text-slate-600",
 };
 
+const ratioScaleMax = 2.5;
+
 const ratioBands = [
   { min: 0, max: 0.8, color: "#FEF3C7" },
   { min: 0.8, max: 1.3, color: "#DCFCE7" },
@@ -66,7 +68,7 @@ export function AcwrDashboard({
   suggestions,
 }: AcwrDashboardProps) {
   const ratioPosition =
-    summary.ratio !== null ? Math.min(summary.ratio / 2.5, 1) : 0;
+    summary.ratio !== null ? Math.min(summary.ratio / ratioScaleMax, 1) : 0;
   const safeCapacity =
     summary.remainingCapacity !== null
       ? `${Math.round(summary.remainingCapacity).toLocaleString()} AU`
@@ -118,7 +120,20 @@ export function AcwrDashboard({
           </div>
 
           <div>
-            <div className="relative h-3 rounded-full bg-gradient-to-r from-slate-200 via-emerald-200 via-amber-200 to-rose-200">
+            <div className="relative h-3 rounded-full">
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: `linear-gradient(
+                    90deg,
+                    #FECACA 0%,
+                    #FECACA ${(0.8 / ratioScaleMax) * 100}%,
+                    #DCFCE7 ${(1.3 / ratioScaleMax) * 100}%,
+                    #FDE68A ${(1.5 / ratioScaleMax) * 100}%,
+                    #FECACA 100%
+                  )`,
+                }}
+              />
               <div
                 className="absolute top-1/2 size-4 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-slate-900 shadow"
                 style={{ left: `${ratioPosition * 100}%` }}
@@ -200,9 +215,17 @@ export function AcwrDashboard({
                 ticks={[0, 0.8, 1.0, 1.3, 1.5, 2]}
               />
               <Tooltip
-                formatter={(value: number | null) =>
-                  value !== null ? value.toFixed(2) : "Not enough data"
-                }
+                formatter={(value) => {
+                  const numeric =
+                    typeof value === "number"
+                      ? value
+                      : value !== null && value !== undefined
+                        ? Number(value)
+                        : null;
+                  return Number.isFinite(numeric)
+                    ? (numeric as number).toFixed(2)
+                    : "Not enough data";
+                }}
               />
               {ratioBands.map((band) => (
                 <ReferenceArea

@@ -3,7 +3,7 @@ import {
   type DistanceUnit,
   type WorkoutLoadInput,
   roundLoadMetric,
-} from "./training-load.ts";
+} from "./training-load";
 
 export type TrainingLoadWorkout = WorkoutLoadInput & {
   workout_date: string;

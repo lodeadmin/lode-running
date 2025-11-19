@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.223.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.3";
 
-import { computeWorkoutLoad } from "../../../../src/lib/training-load.ts";
+import { computeWorkoutLoad } from "../../../../src/lib/training-load";
 
 type UserDevice = {
   id: string;

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { computeWorkoutLoad } from "./training-load.ts";
+import { computeWorkoutLoad } from "./training-load";
 
 type TerraProvider =
   | "fitbit"
